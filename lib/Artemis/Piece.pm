@@ -12,4 +12,6 @@ sub new {
   }
 }
 
+sub space_id { shift->{'space_id'} }
+
 1;

@@ -38,14 +38,12 @@ ol, ul, li {
 </style>
 HTML
 
-    my $content = <<HTML;
-<p>user_id: $user_id<br />
-page_id: $page_id</p>
-HTML
+my $content = '';;
+#    my $content = <<HTML;
+#HTML
 
     my $html = join("\n", $css, $content);
     $c->render(text => $html);
 };
 
 app->start;
-

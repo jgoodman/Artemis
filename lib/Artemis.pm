@@ -1,16 +1,40 @@
 package Artemis;
+
+=head1 NAME
+
+Artemis - A game engine for "choose your adventure" type stories
+
+=cut
+
 use strict;
 use warnings;
+
 use DBI;
 use JSON;
 use Artemis::Space;
 use Artemis::Piece;
+
 use parent 'Games::Board';
 
 our $config;
 our $dbh;
 
+=head1 METHODS
+
+=head2 config
+
+Returns the config hash which stores settings such as connecting to the database
+
+=cut
+
 sub config { $config ||= require 'Artemis/config' }
+
+=head2 dbh
+
+The database handle
+
+=cut
+
 sub dbh {
     my $board = shift;
     $dbh ||= do {
@@ -19,8 +43,29 @@ sub dbh {
     };
 }
 
+=head2 piececlass
+
+SEE Games::Board
+
+=cut
+
 sub piececlass { 'Artemis::Piece' }
+
+=head2 spaceclass
+
+SEE Games::Board
+
+=cut
+
 sub spaceclass { 'Artemis::Space' }
+
+=head2 load
+
+  my $artemis = Artemis->load(board_id => $id);
+
+Contructor method that creates an object then loads in database information
+
+=cut
 
 sub load {
     my $class = shift;
@@ -50,13 +95,33 @@ sub load {
     return $board;
 }
 
+=head2 piece
+
+Returns a Piece object from given piece_id
+
+=cut
+
 sub piece { my ($b, $id) = @_; $b->{'pieces'}{$id} || die 'board failed to lookup game piece' }
+
+=head2 board_id
+
+Returns board_id.
+
+=cut
 
 sub board_id {
     my $board = shift;
     $board->{'board_id'} = shift if scalar @_;
     return $board->{'board_id'} || die 'board_id missing';
 }
+
+=head2 add_space
+
+SEE Games::Board
+
+Extends parent function to insert a space record unless _no_insert is supplied as true.
+
+=cut
 
 sub add_space {
     my ($board, %args) = @_;
@@ -73,6 +138,14 @@ sub add_space {
     return $space;
 }
 
+=head2 add_piece
+
+SEE Games::Board
+
+Extends parent function to insert a piece record unless _no_insert is supplied as true.
+
+=cut
+
 sub add_piece {
     my ($board, %args) = @_;
     my $insert = delete $args{'_no_insert'} ? 0 : 1;
@@ -80,15 +153,23 @@ sub add_piece {
     if($insert) {
         $board->dbh->do(
             'INSERT INTO pieces (space_id) VALUES (?)',
-            { }, $piece->space_id || 1
+            { }, $piece->current_space_id || 1
         );
     }
     return $piece;
 }
 
+=head2 move_piece
+
+  $artemis->move_piece($piece_obj_or_id, dir => 'north');
+
+Move a piece on the board
+
+=cut
+
 sub move_piece {
     my ($board, $piece_obj_or_id, $how, $which) = @_;
-    
+
     my $piece;
     if(ref $piece_obj_or_id) {
         die 'Bad ref passed in for piece' unless eval { $piece_obj_or_id->isa('Games::Board::Piece') };
@@ -104,11 +185,38 @@ sub move_piece {
     return $piece;
 }
 
+=head2 first_character_id
+
+  my $character_id = $artemis->first_character_id($user_id);
+
+Returns the first character_id for the given user;
+
+=cut
+
+sub first_character_id {
+    my ($board, $user_id) = @_;
+    # TODO have this take character_id and make the client supply that to us instead.
+    return 1; # XD
+}
+
 1;
 
 __END__
 
+=begin comment
+
+Syntax for dropping tables (for development purposes)
+
+  DROP TABLE IF EXISTS boards;
+  DROP TABLE IF EXISTS locations;
+  DROP TABLE IF EXISTS spaces;
+  DROP TABLE IF EXISTS pieces;
+  DROP TABLE IF EXISTS characters;
+
+=end comment
+
 =head1 SQL
+
   CREATE TABLE boards (
     board_id  INT NOT NULL AUTO_INCREMENT,
     name      VARCHAR(255),

@@ -7,16 +7,17 @@ use Artemis::Space;
 use Artemis::Piece;
 use parent 'Games::Board';
 
-our $config ||= require 'Artemis/config';
+our $config;
 our $dbh;
-sub dbh {
-    return $dbh ||= DBI->connect(
-        'dbi:mysql:'.$config->{'db'}->{'name'},
-        $config->{'db'}->{'user'},
-        $config->{'db'}->{'pass'},
-    ) || die "Could not connect";
-}
 
+sub config { $config ||= require 'Artemis/config' }
+sub dbh {
+    my $board = shift;
+    $dbh ||= do {
+        my $db = $board->config->{'db'};
+        DBI->connect('dbi:mysql:'.$db->{'name'}, $db->{'user'}, $db->{'pass'}) or die "Could not connect";
+    };
+}
 
 sub piececlass { 'Artemis::Piece' }
 sub spaceclass { 'Artemis::Space' }

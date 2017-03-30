@@ -1,0 +1,24 @@
+#!/usr/bin/perl
+use cPanelUserConfig;
+use Mojolicious::Lite;
+use Carp;
+use Mojo::UserAgent;
+
+helper ua => sub { Mojo::UserAgent->new };
+
+get '/' => {text => 'Artemis API Online! '.time()};
+
+get '/class' => sub {
+    my $c = shift;
+    $c->render(text => 'Class needed');
+};
+
+get '/class/s' => sub {
+    my $c = shift;
+    my $tx = $c->ua->post('http://paizo.com/pathfinderRPG/prd/coreRulebook/classes/sorcerer.html');
+    (my $body = $tx->res->body) =~ s/^.*<div class = "body">(.*)<div class = "footer">.*$/$1/msg;
+
+    $c->render(text => $body);
+};
+
+app->start;

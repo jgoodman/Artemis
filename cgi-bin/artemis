@@ -1,0 +1,51 @@
+#!/usr/bin/perl
+use cPanelUserConfig;
+use Mojolicious::Lite;
+use Artemis;
+
+# Not found (404)
+get '/missing' => sub { shift->render(template => 'does_not_exist') };
+
+# Exception (500)
+get '/dies' => sub { die 'Intentional error' };
+
+get '/' => {text => 'Artemis API Online! '.time()};
+
+get '/ping' => sub {
+    my $c = shift;
+    $c->render(json => { pong => time, user_id => $c->param('user_id') || '' });
+};
+
+get '/page' => sub {
+    my $c = shift;
+    my $user_id = $c->param('user_id');
+    my $page_id = $c->param('page_id');
+    my $css = <<HTML;
+<style>
+\@import url('https://fonts.googleapis.com/css?family=Amarante');
+\@import url('https://fonts.googleapis.com/css?family=Almendra SC');
+h1 {
+    font-family: 'Almendra SC';
+}
+p {
+    font-family: 'Amarante';
+    font-size: 16pt;
+}
+ol, ul, li {
+    font-family: 'Amarante';
+    font-size: 12pt;
+}
+</style>
+HTML
+
+    my $content = <<HTML;
+<p>user_id: $user_id<br />
+page_id: $page_id</p>
+HTML
+
+    my $html = join("\n", $css, $content);
+    $c->render(text => $html);
+};
+
+app->start;
+

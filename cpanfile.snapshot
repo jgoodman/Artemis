@@ -275,6 +275,17 @@ DISTRIBUTIONS
       parent 0
       strict 0
       warnings 0
+  Games-Dice-0.045
+    pathname: R/RJ/RJBS/Games-Dice-0.045.tar.gz
+    provides:
+      Games::Dice 0.045
+    requirements:
+      Exporter 0
+      ExtUtils::MakeMaker 0
+      if 0
+      perl 5.010
+      strict 0
+      warnings 0
   IO-Socket-IP-0.39
     pathname: P/PE/PEVANS/IO-Socket-IP-0.39.tar.gz
     provides:

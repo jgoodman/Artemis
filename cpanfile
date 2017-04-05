@@ -8,6 +8,7 @@ requires 'JSON';
 requires 'Games::Board';
 requires 'Games::Board::Space';
 requires 'Games::Board::Piece';
+requires 'Games::Dice';
 requires 'Test::Deep';
 requires 'Test::Class';
 requires 'Test::MockModule';

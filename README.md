@@ -9,5 +9,7 @@ Welp, my dreams are coming true! I figured that WordPress will be handling the f
 code any needed features in the backend. Most of this repo is the latter, a backend REST API that the
 included WP plugin talks to.
 
+## FrontEnd WordPress Screenshot
+
 ![A screenshot of the front end](images/FrontEnd_ScreenShot.png "WordPress ScreenShot")
 

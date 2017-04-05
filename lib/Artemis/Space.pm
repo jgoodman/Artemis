@@ -7,7 +7,6 @@ sub new {
   my $class = shift;
   my %args  = @_;
   $args{'id'} = delete $args{'space_id'} if exists $args{'space_id'};
-  $args{'current_space'} = delete $args{'space_id'};
   if(my $self = $class->SUPER::new(%args)) {
         $self->{'post_id'}       = $args{'post_id'};
         $self->{'locatation_id'} = $args{'location_id'};

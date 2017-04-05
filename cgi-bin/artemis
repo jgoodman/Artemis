@@ -3,6 +3,8 @@ use cPanelUserConfig;
 use Mojolicious::Lite;
 use Artemis;
 
+our $css;
+
 # Not found (404)
 get '/missing' => sub { shift->render(template => 'does_not_exist') };
 
@@ -11,16 +13,61 @@ get '/dies' => sub { die 'Intentional error' };
 
 get '/' => {text => 'Artemis API Online! '.time()};
 
-get '/ping' => sub {
+get '/json/ping' => sub {
     my $c = shift;
     $c->render(json => { pong => time, user_id => $c->param('user_id') || '' });
 };
 
-get '/page' => sub {
+post '/json/board' => sub {
     my $c = shift;
-    my $user_id = $c->param('user_id');
+    $c->render(json => { board_id => Artemis->create->board_id });
+};
+
+post '/json/board/:board_id/location' => sub {
+    my $c = shift;
+
+    my $a = Artemis->load(board_id => $c->param('board_id'));
+
+    my $id = $a->add_location( fetch_params($c, 'name') )->id;
+
+    $c->render(json => { location_id => $id });
+};
+
+post '/json/board/:board_id/location/:location_id/space/:space_id' => sub {
+    my $c = shift;
+
+    my $a = Artemis->load(board_id => $c->param('board_id'));
+
+    my $id = $a->add_space( fetch_params($c, 'space_id', 'dir', 'post_id', 'location_id') )->id;
+
+    $c->render(json => { space_id => $id });
+};
+
+get '/html/page' => sub {
+    my $c = shift;
+
+    my $a = Artemis->load;
+    my $character_id = $a->first_character_id($c->param('user_id'));
+
     my $page_id = $c->param('page_id');
-    my $css = <<HTML;
+
+    my $content = '';;
+#    my $content = <<HTML;
+#HTML
+
+    my $html = join("\n", css(), $content);
+    $c->render(text => $html);
+};
+
+sub fetch_params {
+    my $c = shift;
+    my %args;
+    foreach my $key (@_) { $args{$key} = $c->param($key) }
+    return %args;
+}
+
+sub css {
+    $css ||= <<HTML;
 <style>
 \@import url('https://fonts.googleapis.com/css?family=Amarante');
 \@import url('https://fonts.googleapis.com/css?family=Almendra SC');
@@ -38,12 +85,6 @@ ol, ul, li {
 </style>
 HTML
 
-my $content = '';;
-#    my $content = <<HTML;
-#HTML
-
-    my $html = join("\n", $css, $content);
-    $c->render(text => $html);
-};
+}
 
 app->start;

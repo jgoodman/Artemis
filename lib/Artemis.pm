@@ -11,6 +11,7 @@ use warnings;
 
 use DBI;
 use JSON;
+use Artemis::Location;
 use Artemis::Space;
 use Artemis::Piece;
 
@@ -58,6 +59,25 @@ SEE Games::Board
 =cut
 
 sub spaceclass { 'Artemis::Space' }
+
+=head2 create
+
+  my $board_id = Artemis->create;
+
+Contructor method that creates an object then inserts into database
+
+=cut
+
+sub create {
+    my $class = shift;
+    my %args  = @_;
+    my $board = $class->new;
+
+    die 'Failed to insert record' unless $board->dbh->do('INSERT INTO boards (name) VALUES (?)', { }, $args{'name'});
+
+    $board->board_id($board->dbh->last_insert_id(undef, undef, 'boards', undef));
+    return $board;
+}
 
 =head2 load
 
@@ -159,6 +179,24 @@ sub add_piece {
     return $piece;
 }
 
+=head2 add_location
+
+=cut
+
+sub add_location {
+    my ($board, %args) = @_;
+    my $insert = delete $args{'_no_insert'} ? 0 : 1;
+    my $loc = Artemis::Location->new(%args);
+    if($insert) {
+        $board->dbh->do(
+            'INSERT INTO locations (board_id, name) VALUES (?, ?)',
+            { }, $board->board_id, $loc->name
+        );
+        $loc->{'id'} = $board->dbh->last_insert_id(undef, undef, 'locations', undef);
+    }
+    return $loc;
+}
+
 =head2 move_piece
 
   $artemis->move_piece($piece_obj_or_id, dir => 'north');
@@ -237,12 +275,11 @@ Syntax for dropping tables (for development purposes)
 
   /* Think of this table as a "state" that a location may have */
   CREATE TABLE spaces (
-    space_id     INT NOT NULL AUTO_INCREMENT,
-    post_id      INT NOT NULL,
-    location_id  INT NOT NULL,
+    space_id     INT          NOT NULL AUTO_INCREMENT,
+    post_id      VARCHAR(255) NULL,
+    location_id  INT          NOT NULL,
     dir          VARCHAR(255),
     PRIMARY KEY (space_id),
-    UNIQUE      (post_id),
     FOREIGN KEY (location_id) REFERENCES locations(location_id)
   );
 

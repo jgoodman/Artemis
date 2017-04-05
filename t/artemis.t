@@ -7,6 +7,8 @@ use FindBin qw($Bin);
 use Test::More tests => 7;
 use Test::MockModule;
 
+use lib "$Bin/../lib";
+
 use_ok('Artemis::Piece');
 use_ok('Artemis::Space');
 use_ok('Artemis');

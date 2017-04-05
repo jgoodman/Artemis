@@ -3,73 +3,9 @@
 use strict;
 use warnings;
 
-use Games::Dice 'roll';
-our $DEBUG = 1;
+use FindBin qw($Bin);
+use lib "$Bin/../lib";
 
-my @combatants = map { Combatant->new($_) } (
-    { name => 'Gary',    DEX => 2 },
-    { name => 'Bob',     DEX => 2 },
-    { name => 'Sue',     DEX => 3 },
-    { name => 'Goblin1', DEX => 1 },
-    { name => 'Goblin2', DEX => 1 },
-);
+use Artemis::Plugin::Pathfinder::Combat;
 
-my $order = initiative_check(@combatants);
-
-print "\n" if $DEBUG;
-foreach my $roll (sort { $b <=> $a } keys %$order) {
-    print "$roll ".$order->{$roll}."\n";
-}
-
-sub initiative_check {
-    print "Initiative check. Rolling for...\n" if $DEBUG;
-    my %rolls;
-    foreach my $c (@_) {
-        print "  ".$c->name if $DEBUG;
-        sleep 1;
-        my $key = roll('1d20+'.$c->DEX).'.'.$c->DEX;
-        print " $key\n" if $DEBUG;
-        $rolls{ $key } = $c->name;
-    }
-    return \%rolls;
-}
-
-
-
-package Combatant;
-
-use strict;
-use warnings;
-
-sub new {
-    my $class = shift;
-    my $args  = shift;
-    bless $args, $class;
-}
-
-sub name { shift->{'name'} || die 'name missing' }
-sub DEX  { shift->{'DEX'}  || die 'DEX missing' }
-
-
-
-package Combat::Turn;
-
-use strict;
-use warnings;
-
-sub new {
-    my $class = shift;
-    my $args  = shift;
-    bless $args, $class;
-}
-
-sub has_standard_action {
-    my $self = shift;
-    return $self->{'standard_action'} ? 0 : 1;
-}
-
-sub has_move_action {
-    my $self = shift;
-    return $self->{'move_action'} ? 0 : 1;
-}
-
+Artemis::Plugin::Pathfinder::Combat->run;

@@ -2,3 +2,4 @@
 *.swp
 test.artemis.conf
 local/
+.queue

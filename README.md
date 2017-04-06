@@ -1,6 +1,6 @@
 # Artemis
 
-A game engine for "choose your adventure" type stories
+A game engine for a "choose your own adventure" type story game
 
 # Synopsis
 

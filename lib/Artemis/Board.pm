@@ -1,8 +1,8 @@
-package Artemis;
+package Artemis::Board;
 
 =head1 NAME
 
-Artemis - A game engine for "choose your adventure" type stories
+Artemis::Board - A game engine for "choose your adventure" type stories
 
 =cut
 
@@ -11,9 +11,9 @@ use warnings;
 
 use DBI;
 use JSON;
-use Artemis::Location;
-use Artemis::Space;
-use Artemis::Piece;
+use Artemis::Board::Location;
+use Artemis::Board::Space;
+use Artemis::Board::Piece;
 
 use parent 'Games::Board';
 
@@ -50,7 +50,7 @@ SEE Games::Board
 
 =cut
 
-sub piececlass { 'Artemis::Piece' }
+sub piececlass { 'Artemis::Board::Piece' }
 
 =head2 spaceclass
 
@@ -58,11 +58,11 @@ SEE Games::Board
 
 =cut
 
-sub spaceclass { 'Artemis::Space' }
+sub spaceclass { 'Artemis::Board::Space' }
 
 =head2 create
 
-  my $board_id = Artemis->create;
+  my $board_id = Artemis::Board->create;
 
 Contructor method that creates an object then inserts into database
 
@@ -81,7 +81,7 @@ sub create {
 
 =head2 load
 
-  my $artemis = Artemis->load(board_id => $id);
+  my $artemis = Artemis::Board->load(board_id => $id);
 
 Contructor method that creates an object then loads in database information
 
@@ -186,7 +186,7 @@ sub add_piece {
 sub add_location {
     my ($board, %args) = @_;
     my $insert = delete $args{'_no_insert'} ? 0 : 1;
-    my $loc = Artemis::Location->new(%args);
+    my $loc = Artemis::Board::Location->new(%args);
     if($insert) {
         $board->dbh->do(
             'INSERT INTO locations (board_id, name) VALUES (?, ?)',

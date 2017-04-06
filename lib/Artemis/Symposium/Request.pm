@@ -1,4 +1,4 @@
-package Artemis::Plugin::Pathfinder::Combat::Turn;
+package Artemis::Symposium::Request;
 
 use strict;
 use warnings;
@@ -6,7 +6,8 @@ use warnings;
 use File::Slurp;
 use JSON;
 
-use base 'Artemis::Role::Debug';
+use Role::Tiny::With;
+with 'Artemis::Role::Debug';
 
 sub new {
     my $class = shift;

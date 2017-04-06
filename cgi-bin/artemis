@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 use cPanelUserConfig;
 use Mojolicious::Lite;
-use Artemis;
+use Artemis::Board;
 
 our $css;
 
@@ -20,13 +20,13 @@ get '/json/ping' => sub {
 
 post '/json/board' => sub {
     my $c = shift;
-    $c->render(json => { board_id => Artemis->create->board_id });
+    $c->render(json => { board_id => Artemis::Board->create->board_id });
 };
 
 post '/json/board/:board_id/location' => sub {
     my $c = shift;
 
-    my $a = Artemis->load(board_id => $c->param('board_id'));
+    my $a = Artemis::Board->load(board_id => $c->param('board_id'));
 
     my $id = $a->add_location( fetch_params($c, 'name') )->id;
 
@@ -36,7 +36,7 @@ post '/json/board/:board_id/location' => sub {
 post '/json/board/:board_id/location/:location_id/space/:space_id' => sub {
     my $c = shift;
 
-    my $a = Artemis->load(board_id => $c->param('board_id'));
+    my $a = Artemis::Board->load(board_id => $c->param('board_id'));
 
     my $id = $a->add_space( fetch_params($c, 'space_id', 'dir', 'post_id', 'location_id') )->id;
 
@@ -46,7 +46,7 @@ post '/json/board/:board_id/location/:location_id/space/:space_id' => sub {
 get '/html/page' => sub {
     my $c = shift;
 
-    my $a = Artemis->load;
+    my $a = Artemis::Board->load;
     my $character_id = $a->first_character_id($c->param('user_id'));
 
     my $page_id = $c->param('page_id');

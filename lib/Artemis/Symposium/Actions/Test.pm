@@ -1,9 +1,10 @@
-package Artemis::Plugin::Pathfinder::Combat::Actions::Test;
+package Artemis::Symposium::Actions::Test;
 
 use strict;
 use warnings;
 
-use base 'Artemis::Role::Debug';
+use Role::Tiny::With;
+with 'Artemis::Role::Debug';
 
 sub test {
     my $class = shift;

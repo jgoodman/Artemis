@@ -6,6 +6,7 @@ requires 'Data::UUID';
 requires 'DBI';
 requires 'DBD::mysql';
 requires 'JSON';
+requires 'Role::Tiny';
 requires 'Games::Board';
 requires 'Games::Board::Space';
 requires 'Games::Board::Piece';

@@ -12,26 +12,26 @@ use base 'Test::Class';
 sub artemis {
     my $self = shift;
     $self->{'artemis'} = shift if scalar @_;
-    $self->{'artemis'} ||= do { require Artemis; Artemis->new }
+    $self->{'artemis'} ||= do { require Artemis::Board; Artemis::Board->new }
 }
 
 sub database_setup : Test(setup => 1) {
     my $self = shift;
 
     # override config to use test config
-    my $m = $self->{'mock_module'}->{'Artemis'} = Test::MockModule->new('Artemis');
+    my $m = $self->{'mock_module'}->{'Artemis::Board'} = Test::MockModule->new('Artemis::Board');
     {
         no warnings 'once';
-        $m->mock('config', sub { $Artemis::config ||= require "$Bin/../test.artemis.conf" });
+        $m->mock('config', sub { $Artemis::Board::config ||= require "$Bin/../test.artemis.conf" });
     }
 
     # create test database
     foreach my $sql (@{$self->sql_statements_create_tables}) {
         next unless $sql;
         if($sql =~ m|CREATE TABLE (\w+) |) {
-            Artemis->dbh->do("DROP TABLE IF EXISTS $1");
+            Artemis::Board->dbh->do("DROP TABLE IF EXISTS $1");
         }
-        die "Failed Database Setup!\n$sql" unless Artemis->dbh->do($sql);
+        die "Failed Database Setup!\n$sql" unless Artemis::Board->dbh->do($sql);
     }
 
     pass('Database setup complete');
@@ -40,7 +40,7 @@ sub database_setup : Test(setup => 1) {
 sub sql_statements_create_tables {
     my $self = shift;
     $self->{'create_sql'} ||= do {
-        (my $text = `cat $Bin/../lib/Artemis.pm`) =~ s/.*=head1 SQL\n(.+)=cut.*/$1/msg;
+        (my $text = `cat $Bin/../lib/Artemis/Board.pm`) =~ s/.*=head1 SQL\n(.+)=cut.*/$1/msg;
         $text;
         [ split(/;|\n\n/, $text) ];
     };

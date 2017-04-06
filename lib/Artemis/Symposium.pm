@@ -1,4 +1,4 @@
-package Artemis::Plugin::Pathfinder::Combat;
+package Artemis::Symposium;
 
 use strict;
 use warnings;
@@ -8,9 +8,10 @@ use Games::Dice qw(roll);
 use AnyEvent;
 use File::Path qw(make_path remove_tree);
 
-use Artemis::Plugin::Pathfinder::Combat::Turn;
+use Artemis::Symposium::Request;
 
-use base 'Artemis::Role::Debug';
+use Role::Tiny::With;
+with 'Artemis::Role::Debug';
 
 sub new {
     my $class = shift;
@@ -98,7 +99,7 @@ sub loop {
                 participant => { id => $participant->id, name => $participant->name }
             });
             
-            my $turn = $self->wait_on_participant($participant, { initiatives => $initiatives });
+            my $request = $self->wait_on_participant($participant, { initiatives => $initiatives });
             
             $self->status({
                 pid  => $$,
@@ -107,13 +108,12 @@ sub loop {
                 participant => { id => $participant->id, name => $participant->name }
             });
 
-            if(!ref($turn) && $turn) {
-                last if $turn eq 'EndCombat';
-                next if $turn eq 'Skip';
+            if(!ref($request) && $request) {
+                next if $request eq 'Skip';
             }
             else {
                 # TODO process request
-                my $actions = $turn->actions;
+                my $actions = $request->actions;
                 while(my $action = shift(@$actions)) {
                     my $args = shift(@$actions);
                     $self->load_action_class($action)->$action($args, {
@@ -135,7 +135,7 @@ sub loop {
 sub load_action_class {
     my $self   = shift;
     my $action = shift;
-    my $action_class = "Artemis::Plugin::Pathfinder::Combat::Actions::".join('', map{ ucfirst($_) } split('_', $action));
+    my $action_class = "Artemis::Symposium::Actions::".join('', map{ ucfirst($_) } split('_', $action));
     (my $file = "$action_class.pm") =~ s{::}{/}g;
     require $file;
     return $action_class;
@@ -149,15 +149,15 @@ sub wait_on_participant {
     my $args      = shift;
     my $end_turn  = AnyEvent->condvar;
 
-    my $turn;
+    my $request;
     my $t = $self->{'t'} ||= 0;
     $self->debug("Wait on participant [pid:$$ - turn:$t - id:".$participant->id.']');
     
     my $timeout   =  AnyEvent->timer(
         after => $self->participant_timeout_limit,
         cb    => sub {
-            $turn = 'Skip';
-            $self->debug("Combat turn as reached timeout limit [pid:$$ - turn:$t - id:".$participant->id.']');
+            $request = 'Skip';
+            $self->debug("Reached timeout limit when waiting on participant [pid:$$ - turn:$t - id:".$participant->id.']');
             $end_turn->send;
         },
     );
@@ -170,14 +170,14 @@ sub wait_on_participant {
             $self->debug("Checking if queue_file exists [$queue_file]", 2);
             return unless -e $queue_file;
             $self->debug("Found queue_file [$queue_file]");
-            $turn = Artemis::Plugin::Pathfinder::Combat::Turn->load({queue_file => $queue_file});
+            $request = Artemis::Symposium::Request->load({queue_file => $queue_file});
             $end_turn->send;
         },
     );
 
     $end_turn->recv;
 
-    return $turn;
+    return $request;
 }
 
 

@@ -1,4 +1,4 @@
-package Artemis::Space;
+package Artemis::Board::Space;
 use strict;
 use warnings;
 use parent 'Games::Board::Space';

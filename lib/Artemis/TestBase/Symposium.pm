@@ -1,4 +1,4 @@
-package Artemis::Plugin::Pathfinder::Combat::TestBase;
+package Artemis::TestBase::Symposium;
 
 use strict;
 use warnings;
@@ -7,16 +7,16 @@ use FindBin qw($Bin);
 use Test::More;
 use File::Path qw(remove_tree);
 
-use Artemis::Plugin::Pathfinder::Combat::Participant;
+use Artemis::Symposium::Participant;
 
 use base 'Test::Class';
 
-sub queue_dir     { "$Bin/../../../.queue" }
+sub queue_dir     { "$Bin/../../.queue" }
 sub pid_queue_dir { shift->queue_dir."/$$" }
 
 sub participants {
     return [
-        map { Artemis::Plugin::Pathfinder::Combat::Participant->new($_) } (
+        map { Artemis::Symposium::Participant->new($_) } (
             { id => 1, name => 'Gary',    DEX => 2 },
             { id => 2, name => 'Bob',     DEX => 2 },
             { id => 3, name => 'Sue',     DEX => 3 },
@@ -26,16 +26,16 @@ sub participants {
     ]
 }
 
-sub combat {
+sub symposium {
     my $self = shift;
-    $self->{'combat'} ||= Artemis::Plugin::Pathfinder::Combat->new({
+    $self->{'symposium'} ||= Artemis::Symposium->new({
         queue_dir => $self->queue_dir,
         participant_timeout_limit => 20,
     });
 }
 
 sub load_modules   : Test(startup => 1) {
-    use_ok('Artemis::Plugin::Pathfinder::Combat');
+    use_ok('Artemis::Symposium');
 }
 
 1;

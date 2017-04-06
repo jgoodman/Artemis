@@ -1,4 +1,4 @@
-package Artemis::Plugin::Pathfinder::Combat::Participant;
+package Artemis::Symposium::Participant;
 
 use strict;
 use warnings;

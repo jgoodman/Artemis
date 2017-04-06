@@ -1,4 +1,4 @@
-package Artemis::Piece;
+package Artemis::Board::Piece;
 use strict;
 use warnings;
 use parent 'Games::Board::Piece';

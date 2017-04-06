@@ -1,4 +1,4 @@
-package Artemis::Location;
+package Artemis::Board::Location;
 
 use strict;
 use warnings;

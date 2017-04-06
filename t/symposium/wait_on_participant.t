@@ -2,7 +2,7 @@
 
 Test::Class->runtests;
 
-package Artemis::Plugin::Pathfinder::Combat::Test::WaitOnParticipant;
+package Artemis::Symposium::Test::WaitOnParticipant;
 
 use strict;
 use warnings;
@@ -10,9 +10,9 @@ use warnings;
 use FindBin qw($Bin);
 use Test::More;
 
-use lib "$Bin/../../../lib";
+use lib "$Bin/../../lib";
 
-use base qw(Artemis::Plugin::Pathfinder::Combat::TestBase);
+use base qw(Artemis::TestBase::Symposium);
 
 sub setup_queue    : Test(setup => 1) {
     my $self = shift;
@@ -28,7 +28,7 @@ sub setup_queue    : Test(setup => 1) {
 
 sub teardown_queue : Test(teardown => 1) {
     my $self = shift;
-    delete $self->{'combat'};
+    delete $self->{'symposium'};
     remove_tree($self->pid_queue_dir) if -e $self->pid_queue_dir;
     pass('Queue teardown complete');
 }
@@ -36,28 +36,28 @@ sub teardown_queue : Test(teardown => 1) {
 sub timeout : Test(1) {
     my $self = shift;
 
-    $self->combat->{'participant_timeout_limit'} = 3;
+    $self->symposium->{'participant_timeout_limit'} = 3;
     is(
-        $self->combat->wait_on_participant($self->participants->[1]),
+        $self->symposium->wait_on_participant($self->participants->[1]),
         'Skip',
         'Got timeout'
     );
 }
 
-sub got_turn : Test(3) {
+sub request_exists : Test(3) {
     my $self = shift;
 
-    my $turn = $self->combat->wait_on_participant($self->participants->[0]);
+    my $request = $self->symposium->wait_on_participant($self->participants->[0]);
     like(
-        ref($turn),
-        qr/Combat::Turn$/,
-        'Got turn object back'
+        ref($request),
+        qr/Symposium::Request$/,
+        'Got Request object back'
     );
-    note '$turn='.$turn unless ref($turn);
+    note '$request='.$request unless ref($request);
 
-    my $action = $turn->actions->[0];
-    my $args   = $turn->actions->[1];
-    my $action_class = $self->combat->load_action_class($action);
+    my $action = $request->actions->[0];
+    my $args   = $request->actions->[1];
+    my $action_class = $self->symposium->load_action_class($action);
     ok($action_class, "Load class for action $action");
 
     ok($action_class->$action($args, {}), 'Execute action');

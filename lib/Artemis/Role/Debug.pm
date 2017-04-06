@@ -3,7 +3,9 @@ package Artemis::Role::Debug;
 use strict;
 use warnings;
 
-our $DEBUG = 0;
+use Role::Tiny;
+
+our $DEBUG = exists $ENV{'DEBUG'} ? $ENV{'DEBUG'} : 0;
 
 sub debug {
     my $self = shift;

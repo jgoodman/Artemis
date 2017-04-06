@@ -4,6 +4,7 @@ requires 'Mojolicious::Plugin::OpenAPI';
 requires 'YAML::XS';
 requires 'Data::UUID';
 requires 'DBI';
+requires 'DBD::mysql';
 requires 'JSON';
 requires 'Games::Board';
 requires 'Games::Board::Space';

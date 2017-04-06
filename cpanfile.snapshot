@@ -182,6 +182,21 @@ DISTRIBUTIONS
       perl 5.006
       strict 0
       warnings 0
+  DBD-mysql-4.042
+    pathname: M/MI/MICHIELB/DBD-mysql-4.042.tar.gz
+    provides:
+      Bundle::DBD::mysql 4.042
+      DBD::mysql 4.042
+      DBD::mysql::GetInfo undef
+      DBD::mysql::db 4.042
+      DBD::mysql::dr 4.042
+      DBD::mysql::st 4.042
+    requirements:
+      DBI 1.609
+      Data::Dumper 0
+      Devel::CheckLib 0
+      ExtUtils::MakeMaker 0
+      perl 5.008001
   DBI-1.636
     pathname: T/TI/TIMB/DBI-1.636.tar.gz
     provides:
@@ -298,6 +313,18 @@ DISTRIBUTIONS
     requirements:
       Digest::MD5 0
       ExtUtils::MakeMaker 0
+  Devel-CheckLib-1.09
+    pathname: M/MA/MATTN/Devel-CheckLib-1.09.tar.gz
+    provides:
+      Devel::CheckLib 1.09
+    requirements:
+      Exporter 0
+      ExtUtils::MakeMaker 0
+      File::Spec 0
+      File::Temp 0.16
+      IO::CaptureOutput 1.0801
+      Test::More 0.62
+      perl 5.00405
   Devel-GlobalDestruction-0.14
     pathname: H/HA/HAARG/Devel-GlobalDestruction-0.14.tar.gz
     provides:
@@ -475,6 +502,21 @@ DISTRIBUTIONS
       if 0
       perl 5.010
       strict 0
+      warnings 0
+  IO-CaptureOutput-1.1104
+    pathname: D/DA/DAGOLDEN/IO-CaptureOutput-1.1104.tar.gz
+    provides:
+      IO::CaptureOutput 1.1104
+    requirements:
+      Carp 0
+      Exporter 0
+      ExtUtils::MakeMaker 6.17
+      File::Basename 0
+      File::Temp 0.16
+      Symbol 0
+      perl 5.006
+      strict 0
+      vars 0
       warnings 0
   IO-Socket-IP-0.39
     pathname: P/PE/PEVANS/IO-Socket-IP-0.39.tar.gz

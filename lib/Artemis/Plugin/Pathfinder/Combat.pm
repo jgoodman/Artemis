@@ -43,8 +43,7 @@ sub status {
     my $self = shift;
     if(scalar @_) {
         my $s = $self->{'status'} = shift;
-        my $sub = (caller(1))[3];
-        $self->debug($s->{'msg'}, $sub);
+        $self->debug($s->{'msg'});
     }
     return $self->{'status'} || { msg => 'no status set' };
 }
@@ -90,22 +89,22 @@ sub loop {
     while(my @order = sort { $b <=> $a } keys %$initiatives) {
         foreach my $roll (@order) {
             my $t = $self->{'t'}++;
-            my $combatant = $initiatives->{$roll};
+            my $participant = $initiatives->{$roll};
 
             $self->status({
                 pid  => $$,
-                msg  => 'waiting on combatant',
+                msg  => 'waiting on participant',
                 turn => $t,
-                combatant => { id => $combatant->id, name => $combatant->name }
+                participant => { id => $participant->id, name => $participant->name }
             });
             
-            my $turn = $self->wait_on_combatant($combatant, { initiatives => $initiatives });
+            my $turn = $self->wait_on_participant($participant, { initiatives => $initiatives });
             
             $self->status({
                 pid  => $$,
-                msg  => 'processing request for combatant',
+                msg  => 'processing request for participant',
                 turn => $t,
-                combatant => { id => $combatant->id, name => $combatant->name }
+                participant => { id => $participant->id, name => $participant->name }
             });
 
             if(!ref($turn) && $turn) {
@@ -118,7 +117,7 @@ sub loop {
                 while(my $action = shift(@$actions)) {
                     my $args = shift(@$actions);
                     $self->load_action_class($action)->$action($args, {
-                        combatant   => $combatant,
+                        participant => $participant,
                         initiatives => $initiatives,
                         board       => $self->board
                     });
@@ -142,23 +141,23 @@ sub load_action_class {
     return $action_class;
 }
 
-sub combatant_timeout_limit { shift->{'combatant_timeout_limit'} ||= 180 }
+sub participant_timeout_limit { shift->{'participant_timeout_limit'} ||= 180 }
 
-sub wait_on_combatant {
+sub wait_on_participant {
     my $self      = shift;
-    my $combatant = shift;
+    my $participant = shift;
     my $args      = shift;
     my $end_turn  = AnyEvent->condvar;
 
     my $turn;
     my $t = $self->{'t'} ||= 0;
-    $self->debug("Wait on combatant [pid:$$ - turn:$t - id:".$combatant->id.']');
+    $self->debug("Wait on participant [pid:$$ - turn:$t - id:".$participant->id.']');
     
     my $timeout   =  AnyEvent->timer(
-        after => $self->combatant_timeout_limit,
+        after => $self->participant_timeout_limit,
         cb    => sub {
             $turn = 'Skip';
-            $self->debug("Combat turn as reached timeout limit [pid:$$ - turn:$t - id:".$combatant->id.']');
+            $self->debug("Combat turn as reached timeout limit [pid:$$ - turn:$t - id:".$participant->id.']');
             $end_turn->send;
         },
     );
@@ -167,12 +166,11 @@ sub wait_on_combatant {
         after    => 0,
         interval => 2.0,
         cb       => sub {
-            my $queue_file = $self->pid_queue_dir.'/'.$combatant->id;
-            #$self->debug("Checking if queue_file exists [$queue_file]");
+            my $queue_file = $self->pid_queue_dir.'/'.$participant->id;
+            $self->debug("Checking if queue_file exists [$queue_file]", 2);
             return unless -e $queue_file;
             $self->debug("Found queue_file [$queue_file]");
             $turn = Artemis::Plugin::Pathfinder::Combat::Turn->load({queue_file => $queue_file});
-            #$turn->execute;
             $end_turn->send;
         },
     );

@@ -3,13 +3,14 @@ package Artemis::Role::Debug;
 use strict;
 use warnings;
 
-our $DEBUG = 1;
+our $DEBUG = 0;
 
 sub debug {
     my $self = shift;
     my $msg  = shift;
+    my $level = shift || 1;
 
-    return unless $DEBUG;
+    return unless $DEBUG >= $level;
 
     my $i = 0;
     my ($pkg, $sub);

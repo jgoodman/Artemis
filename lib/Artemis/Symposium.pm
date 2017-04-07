@@ -1,5 +1,11 @@
 package Artemis::Symposium;
 
+=head1 NAME
+
+Artemis::Symposium - Queue handler for turn based events (such as combat)
+
+=cut
+
 use strict;
 use warnings;
 

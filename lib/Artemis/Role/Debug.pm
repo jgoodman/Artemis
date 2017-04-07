@@ -27,3 +27,13 @@ sub debug {
 }
 
 1;
+
+__END__
+
+=head1 NAME
+
+Artemis::Role::Debug - Provide debug helper method
+
+=cut
+
+

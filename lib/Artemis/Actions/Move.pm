@@ -31,3 +31,12 @@ sub execute {
 }
 
 1;
+
+__END__
+
+=head1 NAME
+
+Artemis::Actions::Move - Action to move a piece on the board
+
+=cut
+

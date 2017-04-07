@@ -39,3 +39,12 @@ sub load_modules   : Test(startup => 1) {
 }
 
 1;
+
+__END__
+
+=head1 NAME
+
+Artemis::TestBase::Symposium - Base class for testing Artemis::Symposium
+
+=cut
+

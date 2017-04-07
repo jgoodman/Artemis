@@ -47,3 +47,12 @@ sub sql_statements_create_tables {
 }
 
 1;
+
+__END__
+
+=head1 NAME
+
+Artemis::TestBase::DB - Base class for database setup and teardown for testing
+
+=cut
+

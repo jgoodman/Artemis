@@ -13,3 +13,11 @@ sub new {
 }
 
 1;
+
+=head1 NAME
+
+Artemis::Board::Piece - Subclaasses Games::Board::Piece
+
+=cut
+
+

@@ -16,3 +16,12 @@ sub execute {
 }
 
 1;
+
+__END__
+
+=head1 NAME
+
+Artemis::Actions::Null - A "do nothing" action
+
+=cut
+

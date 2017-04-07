@@ -13,3 +13,16 @@ sub execute {
 }
 
 1;
+
+__END__
+
+=head1 NAME
+
+Artemis::Role::Action
+
+=head1 SYNOPSIS
+
+Composessed of conditions and executions
+
+=cut
+

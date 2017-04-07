@@ -37,3 +37,12 @@ sub dbh {
 }
 
 1;
+
+__END__
+
+=head1 NAME
+
+Artemis::Role::DBH - Provides database handle
+
+=cut
+

@@ -1,6 +1,8 @@
 package Artemis::Board::Space;
+
 use strict;
 use warnings;
+
 use parent 'Games::Board::Space';
 
 sub new {
@@ -14,9 +16,34 @@ sub new {
   }
   die 'failed to init '.$class;
 }
-
 sub post_id { shift->{'post_id'} }
 sub location_id { shift->{'location_id'} }
 
-
 1;
+
+__END__
+
+=head1 NAME
+
+Artemis::Board::Space - Subclaasses Games::Board::Space
+
+=cut
+
+=head1 METHODS
+
+=head2 new
+
+Extends constructor method from parent class
+
+=cut
+
+=head2 post_id
+
+Accessor method
+
+=head2 location_id
+
+Accessor method
+
+=cut
+

@@ -116,7 +116,7 @@ sub loop {
                 my $actions = $request->actions;
                 while(my $action = shift(@$actions)) {
                     my $args = shift(@$actions);
-                    $self->load_action_class($action)->$action($args, {
+                    $self->load_action_class($action)->execute($args, {
                         participant => $participant,
                         initiatives => $initiatives,
                         board       => $self->board
@@ -135,7 +135,7 @@ sub loop {
 sub load_action_class {
     my $self   = shift;
     my $action = shift;
-    my $action_class = "Artemis::Symposium::Actions::".join('', map{ ucfirst($_) } split('_', $action));
+    my $action_class = "Artemis::Actions::".join('', map{ ucfirst($_) } split('_', $action));
     (my $file = "$action_class.pm") =~ s{::}{/}g;
     require $file;
     return $action_class;

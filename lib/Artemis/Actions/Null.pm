@@ -1,4 +1,4 @@
-package Artemis::Symposium::Actions::Test;
+package Artemis::Actions::Null;
 
 use strict;
 use warnings;
@@ -6,12 +6,12 @@ use warnings;
 use Role::Tiny::With;
 with 'Artemis::Role::Debug';
 
-sub test {
+sub execute {
     my $class = shift;
     my $args  = shift;
     my $stash = shift;
     my $self = bless $stash, $class;
-    $self->debug('Nohup action');
+    $self->debug('Null action');
     return 1;
 }
 

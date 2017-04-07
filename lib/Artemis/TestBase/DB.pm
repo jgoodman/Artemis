@@ -22,7 +22,7 @@ sub database_setup : Test(setup => 1) {
     my $m = $self->{'mock_module'}->{'Artemis::Board'} = Test::MockModule->new('Artemis::Board');
     {
         no warnings 'once';
-        $m->mock('config', sub { $Artemis::Board::config ||= require "$Bin/../test.artemis.conf" });
+        $m->mock('config', sub { $Artemis::Board::config ||= require 'Artemis/config.test' });
     }
 
     # create test database
@@ -40,7 +40,8 @@ sub database_setup : Test(setup => 1) {
 sub sql_statements_create_tables {
     my $self = shift;
     $self->{'create_sql'} ||= do {
-        (my $text = `cat $Bin/../lib/Artemis/Board.pm`) =~ s/.*=head1 SQL\n(.+)=cut.*/$1/msg;
+        my $file = $INC{'Artemis/Board.pm'};
+        (my $text = `cat $file`) =~ s/.*=head1 SQL\n(.+)=cut.*/$1/msg;
         [ split(/;|\n\n/, $text) ];
     };
 }

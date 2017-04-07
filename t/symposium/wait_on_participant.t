@@ -20,7 +20,7 @@ sub setup_queue    : Test(setup => 1) {
     my $pid_queue_dir = $self->pid_queue_dir;
     mkdir $pid_queue_dir unless -e $pid_queue_dir;
 
-    my $echo = "echo '{\"actions\":[\"test\",\"1,1\",\"standard\",{\"attack\":2}]}' > $pid_queue_dir/1";
+    my $echo = "echo '{\"actions\":[\"null\",\"1,1\",\"standard\",{\"attack\":2}]}' > $pid_queue_dir/1";
     `$echo`;
 
     pass('Queue setup complete');
@@ -60,6 +60,6 @@ sub request_exists : Test(3) {
     my $action_class = $self->symposium->load_action_class($action);
     ok($action_class, "Load class for action $action");
 
-    ok($action_class->$action($args, {}), 'Execute action');
+    ok($action_class->execute($args, {}), 'Execute action');
 }
 

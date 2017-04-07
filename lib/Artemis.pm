@@ -1,8 +1,8 @@
-package Artemis::Board;
+package Artemis;
 
 =head1 NAME
 
-Artemis::Board - A game engine for "choose your adventure" type stories
+Artemis - A game engine for "choose your adventure" type stories
 
 =cut
 
@@ -11,16 +11,38 @@ use warnings;
 
 use DBI;
 use JSON;
-use Artemis::Board::Location;
-use Artemis::Board::Space;
-use Artemis::Board::Piece;
+use Artemis::Location;
+use Artemis::Space;
+use Artemis::Piece;
 
 use parent 'Games::Board';
 
-use Role::Tiny::With;
-with 'Artemis::Role::DBH';
+our $config;
+our $dbh;
 
 =head1 METHODS
+
+=head2 config
+
+Returns the config hash which stores settings such as connecting to the database
+
+=cut
+
+sub config { $config ||= require 'Artemis/config' }
+
+=head2 dbh
+
+The database handle
+
+=cut
+
+sub dbh {
+    my $board = shift;
+    $dbh ||= do {
+        my $db = $board->config->{'db'};
+        DBI->connect('dbi:mysql:'.$db->{'name'}, $db->{'user'}, $db->{'pass'}) or die "Could not connect";
+    };
+}
 
 =head2 piececlass
 
@@ -28,7 +50,7 @@ SEE Games::Board
 
 =cut
 
-sub piececlass { 'Artemis::Board::Piece' }
+sub piececlass { 'Artemis::Piece' }
 
 =head2 spaceclass
 
@@ -36,11 +58,11 @@ SEE Games::Board
 
 =cut
 
-sub spaceclass { 'Artemis::Board::Space' }
+sub spaceclass { 'Artemis::Space' }
 
 =head2 create
 
-  my $board_id = Artemis::Board->create;
+  my $board_id = Artemis->create;
 
 Contructor method that creates an object then inserts into database
 
@@ -59,7 +81,7 @@ sub create {
 
 =head2 load
 
-  my $artemis = Artemis::Board->load(board_id => $id);
+  my $artemis = Artemis->load(board_id => $id);
 
 Contructor method that creates an object then loads in database information
 
@@ -164,7 +186,7 @@ sub add_piece {
 sub add_location {
     my ($board, %args) = @_;
     my $insert = delete $args{'_no_insert'} ? 0 : 1;
-    my $loc = Artemis::Board::Location->new(%args);
+    my $loc = Artemis::Location->new(%args);
     if($insert) {
         $board->dbh->do(
             'INSERT INTO locations (board_id, name) VALUES (?, ?)',

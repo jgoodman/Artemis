@@ -41,7 +41,6 @@ sub sql_statements_create_tables {
     my $self = shift;
     $self->{'create_sql'} ||= do {
         (my $text = `cat $Bin/../lib/Artemis/Board.pm`) =~ s/.*=head1 SQL\n(.+)=cut.*/$1/msg;
-        $text;
         [ split(/;|\n\n/, $text) ];
     };
 }

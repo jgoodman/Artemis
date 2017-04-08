@@ -22,9 +22,9 @@ sub load_modules : Test(startup => +1) {
     use_ok('Artemis::Actions::EnterSymposium');
 }
 
-sub create : Test(1) {
+sub insert : Test(1) {
     my $self = shift;
-    local $TODO = 'Code Artemis::Symposium->create method';
+    local $TODO = 'Code Artemis::Symposium->insert method';
     ok(
         eval { Artemis::Actions::EnterSymposium->execute({entities => $self->entities}) },
         'Execution returned true'

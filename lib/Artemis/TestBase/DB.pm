@@ -9,10 +9,14 @@ use Test::MockModule;
 
 use base 'Test::Class';
 
-sub artemis {
+sub artemis { goto &board }
+sub board {
     my $self = shift;
-    $self->{'artemis'} = shift if scalar @_;
-    $self->{'artemis'} ||= do { require Artemis::Board; Artemis::Board->new }
+    $self->{'board'} = shift if scalar @_;
+    $self->{'board'} ||= do {
+        require Artemis::Board;
+        Artemis::Board->new
+    }
 }
 
 sub database_setup : Test(setup => 1) {

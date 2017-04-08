@@ -9,7 +9,6 @@ Artemis::Board - A game engine for "choose your adventure" type stories
 use strict;
 use warnings;
 
-use DBI;
 use JSON;
 use Artemis::Board::Location;
 use Artemis::Board::Space;
@@ -38,15 +37,15 @@ SEE Games::Board
 
 sub spaceclass { 'Artemis::Board::Space' }
 
-=head2 create
+=head2 insert
 
-  my $board_id = Artemis::Board->create;
+  my $board_id = Artemis::Board->insert;
 
-Contructor method that creates an object then inserts into database
+Contructor method that inserts an object then inserts into database
 
 =cut
 
-sub create {
+sub insert {
     my $class = shift;
     my %args  = @_;
     my $board = $class->new;
@@ -61,7 +60,7 @@ sub create {
 
   my $artemis = Artemis::Board->load(board_id => $id);
 
-Contructor method that creates an object then loads in database information
+Contructor method that inserts an object then loads in database information
 
 =cut
 

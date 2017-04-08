@@ -20,7 +20,7 @@ get '/json/ping' => sub {
 
 post '/json/board' => sub {
     my $c = shift;
-    $c->render(json => { board_id => Artemis->create->board_id });
+    $c->render(json => { board_id => Artemis->insert->board_id });
 };
 
 post '/json/board/:board_id/location' => sub {

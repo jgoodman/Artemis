@@ -8,6 +8,7 @@ use strict;
 use warnings;
 
 use FindBin qw($Bin);
+use File::Path qw(remove_tree);
 use Test::More;
 
 use lib "$Bin/../../lib";

@@ -65,7 +65,18 @@ INSERT INTO entity_options (entity_id, name, value) VALUES (1, 'user_id', 1);
 CREATE TABLE symposiums (
   symposium_id        INT          NOT NULL AUTO_INCREMENT,
   class               VARCHAR(255) NULL,
+  state               VARCHAR(255) NULL,
+  pid                 INT          NOT NULL,
   PRIMARY KEY (symposium_id)
+);
+
+CREATE TABLE symposium_logs (
+  symposium_log_id    INT          NOT NULL AUTO_INCREMENT,
+  entry_date          TIMESTAMP    DEFAULT NOW(), 
+  symposium_id        INT          NOT NULL,
+  state               VARCHAR(255) NULL,
+  meta                VARCHAR(255) NULL,
+  PRIMARY KEY (symposium_log_id)
 );
 
 CREATE TABLE symposium_entities (

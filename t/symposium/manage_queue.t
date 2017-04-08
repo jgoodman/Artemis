@@ -13,7 +13,7 @@ use File::Path qw(remove_tree);
 
 use lib "$Bin/../../lib";
 
-use base qw(Test::Class);
+use base qw(Artemis::TestBase::Symposium);
 
 sub queue_dir     { "$Bin/../../.queue" }
 sub pid_queue_dir { shift->queue_dir."/$$" }
@@ -25,18 +25,11 @@ sub load_modules : Test(startup => 1) {
 sub main : Test(2) {
     my $self = shift;
 
-    my $symposium = Artemis::Symposium->new({
-        queue_dir => $self->queue_dir,
-        entity_timeout_limit => 5,
-    });
+    my $symposium = $self->symposium;
 
     isa_ok($symposium, 'Artemis::Symposium');
 
-    my $pid_queue_dir = $self->pid_queue_dir;
-    ok(-e $pid_queue_dir, 'Object created queue dir') or return "Failed to create queue dir [$pid_queue_dir]";
+    my $pid_queue_dir = $symposium->pid_queue_dir;
+    ok(-e $pid_queue_dir, 'Object created queue dir') or diag "Failed to create queue dir [$pid_queue_dir]";
 }
 
-sub remove_queue : Test(shutdown => 1) {
-    my $self = shift;
-    ok(! -e $self->pid_queue_dir, 'Object removed queue dir') or remove_tree($self->pid_queue_dir);
-}

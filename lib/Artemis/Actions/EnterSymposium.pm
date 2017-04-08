@@ -28,7 +28,7 @@ sub symposium_id { shift->{'symposium_id'} }
 sub symposium {
     my $self = shift;
     $self->{'symposium'} ||= $self->symposium_id ? Artemis::Symposium->load(symposium_id => $self->symposium_id) : do {
-        my $s = Artemis::Symposium->create();
+        my $s = Artemis::Symposium->insert();
         $self->{'symposium_id'} = $s->id;
         $s;
     }

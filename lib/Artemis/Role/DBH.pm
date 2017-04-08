@@ -10,6 +10,7 @@ use strict;
 use warnings;
 
 use Role::Tiny;
+use DBI;
 
 our $config;
 our $dbh;

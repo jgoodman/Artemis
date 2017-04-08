@@ -16,7 +16,7 @@ sub debug {
 
     my $i = 0;
     my ($pkg, $sub);
-    while(! $sub || $sub =~ m/^(?:.+::)?(?:debug|status)$/) {
+    while(! $sub || $sub =~ m/^(?:.+::)?(?:debug|state)$/) {
         $i++;
         ($pkg, $sub) = ((caller($i))[0,3] =~ m/^(.+)::([^:]+)$/);
     }

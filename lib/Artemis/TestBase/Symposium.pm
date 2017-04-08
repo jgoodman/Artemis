@@ -7,16 +7,16 @@ use FindBin qw($Bin);
 use Test::More;
 use File::Path qw(remove_tree);
 
-use Artemis::Symposium::Participant;
+use Artemis::Symposium::Entity;
 
 use base 'Test::Class';
 
 sub queue_dir     { "$Bin/../../.queue" }
 sub pid_queue_dir { shift->queue_dir."/$$" }
 
-sub participants {
+sub entities {
     return [
-        map { Artemis::Symposium::Participant->new($_) } (
+        map { Artemis::Symposium::Entity->new($_) } (
             { id => 1, name => 'Gary',    DEX => 2 },
             { id => 2, name => 'Bob',     DEX => 2 },
             { id => 3, name => 'Sue',     DEX => 3 },
@@ -30,7 +30,7 @@ sub symposium {
     my $self = shift;
     $self->{'symposium'} ||= Artemis::Symposium->new({
         queue_dir => $self->queue_dir,
-        participant_timeout_limit => 20,
+        entity_timeout_limit => 20,
     });
 }
 

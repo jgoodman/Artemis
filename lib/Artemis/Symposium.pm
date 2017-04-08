@@ -56,26 +56,26 @@ sub status {
     return $self->{'status'} || { msg => 'no status set' };
 }
 
-sub add_participants { push @{shift->participants}, @_ }
-sub participants { shift->{'participants'} ||= [ ] }
+sub add_entities { push @{shift->entities}, @_ }
+sub entities { shift->{'entities'} ||= [ ] }
 
 sub initiative_check {
     my $self = shift;
     $self->status({pid => $$, msg => 'initiative_check'});
     my %rolls;
-    my @participants = @{$self->participants};
-    while (my $c = shift(@participants)) {
+    my @entities = @{$self->entities};
+    while (my $c = shift(@entities)) {
         my $key = roll('1d20+'.$c->DEX).'.'.$c->DEX;
         $self->debug("Rolled: ".$c->name." => $key");
         if(exists $rolls{$key}) {
             # Re-roll when same occurs
-            push @participants, delete($rolls{$key});
-            push @participants, $c;
+            push @entities, delete($rolls{$key});
+            push @entities, $c;
         }
         else {
             $rolls{ $key } = $c;
         }
-        sleep .5 if scalar @participants;
+        sleep .5 if scalar @entities;
     }
 
     foreach my $roll (keys %rolls) {
@@ -96,22 +96,22 @@ sub loop {
     while(my @order = sort { $b <=> $a } keys %$initiatives) {
         foreach my $roll (@order) {
             my $t = $self->{'t'}++;
-            my $participant = $initiatives->{$roll};
+            my $entity = $initiatives->{$roll};
 
             $self->status({
                 pid  => $$,
-                msg  => 'waiting on participant',
+                msg  => 'waiting on entity',
                 turn => $t,
-                participant => { id => $participant->id, name => $participant->name }
+                entity => { id => $entity->id, name => $entity->name }
             });
             
-            my $request = $self->wait_on_participant($participant, { initiatives => $initiatives });
+            my $request = $self->wait_on_entity($entity, { initiatives => $initiatives });
             
             $self->status({
                 pid  => $$,
-                msg  => 'processing request for participant',
+                msg  => 'processing request for entity',
                 turn => $t,
-                participant => { id => $participant->id, name => $participant->name }
+                entity => { id => $entity->id, name => $entity->name }
             });
 
             if(!ref($request) && $request) {
@@ -142,23 +142,23 @@ sub load_action_class {
     return $action_class;
 }
 
-sub participant_timeout_limit { shift->{'participant_timeout_limit'} ||= 180 }
+sub entity_timeout_limit { shift->{'entity_timeout_limit'} ||= 180 }
 
-sub wait_on_participant {
+sub wait_on_entity {
     my $self      = shift;
-    my $participant = shift;
+    my $entity = shift;
     my $args      = shift;
     my $end_turn  = AnyEvent->condvar;
 
     my $request;
     my $t = $self->{'t'} ||= 0;
-    $self->debug("Wait on participant [pid:$$ - turn:$t - id:".$participant->id.']');
+    $self->debug("Wait on entity [pid:$$ - turn:$t - id:".$entity->id.']');
     
     my $timeout   =  AnyEvent->timer(
-        after => $self->participant_timeout_limit,
+        after => $self->entity_timeout_limit,
         cb    => sub {
             $request = 'Skip';
-            $self->debug("Reached timeout limit when waiting on participant [pid:$$ - turn:$t - id:".$participant->id.']');
+            $self->debug("Reached timeout limit when waiting on entity [pid:$$ - turn:$t - id:".$entity->id.']');
             $end_turn->send;
         },
     );
@@ -167,7 +167,7 @@ sub wait_on_participant {
         after    => 0,
         interval => 2.0,
         cb       => sub {
-            my $queue_file = $self->pid_queue_dir.'/'.$participant->id;
+            my $queue_file = $self->pid_queue_dir.'/'.$entity->id;
             $self->debug("Checking if queue_file exists [$queue_file]", 2);
             return unless -e $queue_file;
             $self->debug("Found queue_file [$queue_file]");

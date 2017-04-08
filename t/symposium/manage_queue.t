@@ -27,7 +27,7 @@ sub main : Test(2) {
 
     my $symposium = Artemis::Symposium->new({
         queue_dir => $self->queue_dir,
-        participant_timeout_limit => 5,
+        entity_timeout_limit => 5,
     });
 
     isa_ok($symposium, 'Artemis::Symposium');

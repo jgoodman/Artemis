@@ -2,7 +2,7 @@
 
 Test::Class->runtests;
 
-package Artemis::Symposium::Test::WaitOnParticipant;
+package Artemis::Symposium::Test::WaitOnEntity;
 
 use strict;
 use warnings;
@@ -36,9 +36,9 @@ sub teardown_queue : Test(teardown => 1) {
 sub timeout : Test(1) {
     my $self = shift;
 
-    $self->symposium->{'participant_timeout_limit'} = 3;
+    $self->symposium->{'entity_timeout_limit'} = 3;
     is(
-        $self->symposium->wait_on_participant($self->participants->[1]),
+        $self->symposium->wait_on_entity($self->entities->[1]),
         'Skip',
         'Got timeout'
     );
@@ -47,7 +47,7 @@ sub timeout : Test(1) {
 sub request_exists : Test(3) {
     my $self = shift;
 
-    my $request = $self->symposium->wait_on_participant($self->participants->[0]);
+    my $request = $self->symposium->wait_on_entity($self->entities->[0]);
     like(
         ref($request),
         qr/Symposium::Request$/,

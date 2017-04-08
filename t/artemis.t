@@ -13,25 +13,13 @@ use Test::More;
 use lib "$Bin/../lib";
 use base qw(Artemis::TestBase::DB);
 
-sub create_player : Test(1) {
-    my $self = shift;
-    local $TODO = 'Code step';
-    fail('Step completed: '.$self->current_method);
-}
-
-sub trigger_event : Test(1) {
-    my $self = shift;
-    local $TODO = 'Code step';
-    fail('Step completed: '.$self->current_method);
-}
-
 sub enter_combat : Test(1) {
     my $self = shift;
     local $TODO = 'Code step';
     fail('Step completed: '.$self->current_method);
 }
 
-sub generate_npc : Test(1) {
+sub generate_pieces : Test(1) {
     my $self = shift;
     local $TODO = 'Code step';
     fail('Step completed: '.$self->current_method);

@@ -24,9 +24,9 @@ sub load_modules : Test(startup => +1) {
 
 sub create : Test(1) {
     my $self = shift;
-    local $TODO = 'Finish coding this';
+    local $TODO = 'Code Artemis::Symposium->create method';
     ok(
-        Artemis::Actions::EnterSymposium->execute({participants => $self->participants}),
+        eval { Artemis::Actions::EnterSymposium->execute({entities => $self->entities}) },
         'Execution returned true'
     );
 }
@@ -34,9 +34,9 @@ sub create : Test(1) {
 sub load : Test(1) {
     my $self = shift;
 
-    local $TODO = 'Finish coding this';
+    local $TODO = 'Setup existing symposium then pass in id';
     ok(
-        Artemis::Actions::EnterSymposium->execute({participants => $self->participants}),
+        eval { Artemis::Actions::EnterSymposium->execute({entities => $self->entities}) },
         'Execution returned true'
     );
 }

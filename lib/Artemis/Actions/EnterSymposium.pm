@@ -18,7 +18,7 @@ sub execute {
 
     return unless $self->conditions;
 
-    $self->symposium->add_participants(@{$args->{'participants'}});
+    $self->symposium->add_entities(@{$args->{'entities'}});
 
     return 1;
 }
@@ -34,9 +34,7 @@ sub symposium {
     }
 }
 
-sub conditions {
-
-}
+sub conditions { 1 }
 
 1;
 

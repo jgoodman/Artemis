@@ -1,0 +1,7 @@
+DROP TABLE IF EXISTS boards;
+DROP TABLE IF EXISTS locations;
+DROP TABLE IF EXISTS spaces;
+DROP TABLE IF EXISTS pieces;
+DROP TABLE IF EXISTS characters;
+DROP TABLE IF EXISTS symposium_participant;
+DROP TABLE IF EXISTS symposium;

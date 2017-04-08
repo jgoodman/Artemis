@@ -41,8 +41,10 @@ sub sql_statements_create_tables {
     my $self = shift;
     $self->{'create_sql'} ||= do {
         my $file = $INC{'Artemis/Board.pm'};
-        (my $text = `cat $file`) =~ s/.*=head1 SQL\n(.+)=cut.*/$1/msg;
-        [ split(/;|\n\n/, $text) ];
+        $file =~ s|lib/Artemis/Board\.pm$|docs/create.sql|;
+        #(my $text = `cat $file`) =~ s/.*=head1 SQL\n(.+)=cut.*/$1/msg;
+        my $text = `cat $file`;
+        [ split(/\n\n/, $text) ];
     };
 }
 

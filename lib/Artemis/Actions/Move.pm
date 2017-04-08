@@ -7,7 +7,6 @@ use Artemis::Board;
 
 use Role::Tiny::With;
 with 'Artemis::Role::Debug';
-with 'Artemis::Role::DBH';
 
 sub execute {
     my $class = shift;

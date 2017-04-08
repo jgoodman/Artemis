@@ -16,8 +16,8 @@ use base qw(Artemis::TestBase::Symposium);
 
 sub main : Test(1) {
     my $self = shift;
-    my $participants = $self->participants;
-    my $initiatives = $self->symposium->initiative_check(@$participants);
+    $self->symposium->add_participants(@{$self->participants});
+    my $initiatives = $self->symposium->initiative_check();
     is(scalar keys %$initiatives, 5, 'Initiative check works');
 }
 

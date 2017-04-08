@@ -18,6 +18,7 @@ use Artemis::Symposium::Request;
 
 use Role::Tiny::With;
 with 'Artemis::Role::Debug';
+with 'Artemis::Role::DBH';
 
 sub new {
     my $class = shift;
@@ -55,27 +56,26 @@ sub status {
     return $self->{'status'} || { msg => 'no status set' };
 }
 
-sub  board {
-    my $self = shift;
-    $self->{'board'} ||= shift if scalar @_;
-    return $self->{'board'};# || die 'board missing';
-}
+sub add_participants { push @{shift->participants}, @_ }
+sub participants { shift->{'participants'} ||= [ ] }
 
 sub initiative_check {
     my $self = shift;
     $self->status({pid => $$, msg => 'initiative_check'});
     my %rolls;
-    while (my $c = shift) {
+    my @participants = @{$self->participants};
+    while (my $c = shift(@participants)) {
         my $key = roll('1d20+'.$c->DEX).'.'.$c->DEX;
         $self->debug("Rolled: ".$c->name." => $key");
         if(exists $rolls{$key}) {
-            push @_, delete($rolls{$key});
-            push @_, $c;
+            # Re-roll when same occurs
+            push @participants, delete($rolls{$key});
+            push @participants, $c;
         }
         else {
             $rolls{ $key } = $c;
         }
-        sleep .5 if scalar @_;
+        sleep .5 if scalar @participants;
     }
 
     foreach my $roll (keys %rolls) {
@@ -90,7 +90,7 @@ sub initiative_check {
 sub loop {
     my $self = shift;
 
-    my $initiatives = $self->initiative_check(@_);
+    my $initiatives = $self->initiative_check;
 
     $self->{'t'} = 0;
     while(my @order = sort { $b <=> $a } keys %$initiatives) {
@@ -118,15 +118,10 @@ sub loop {
                 next if $request eq 'Skip';
             }
             else {
-                # TODO process request
                 my $actions = $request->actions;
                 while(my $action = shift(@$actions)) {
                     my $args = shift(@$actions);
-                    $self->load_action_class($action)->execute($args, {
-                        participant => $participant,
-                        initiatives => $initiatives,
-                        board       => $self->board
-                    });
+                    $self->load_action_class($action)->execute($args);
                 }   
             }
         }

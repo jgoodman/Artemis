@@ -39,17 +39,6 @@ CREATE TABLE pieces (
 
 INSERT INTO pieces (space_id) VALUES (1);
 
-CREATE TABLE characters (
-  character_id        INT          NOT NULL AUTO_INCREMENT,
-  user_id             INT          NULL,
-  name                VARCHAR(255) NULL,
-  piece_id            INT          NOT NULL,
-  PRIMARY KEY (character_id),
-  FOREIGN KEY (piece_id) REFERENCES pieces(piece_id)
-);
-
-INSERT INTO characters (user_id, name, piece_id) VALUES (1, 'Arian', 1);
-
 CREATE TABLE entities (
   entity_id           INT          NOT NULL AUTO_INCREMENT,
   class               VARCHAR(255) NOT NULL,

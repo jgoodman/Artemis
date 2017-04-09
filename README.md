@@ -69,13 +69,13 @@ This section pertains to character manipulation
 
 ### Create
 
-  curl -X POST localhost/cgi-bin/artemis
+    curl -X POST localhost/cgi-bin/artemis
 
 Returns the newly created CharacterId
 
 ### Retrieve
 
-  curl localhost/cgi-bin/artemis/:CharacterID
+    curl localhost/cgi-bin/artemis/:CharacterID
 
 Returns stats and other information for given CharacterID
 
@@ -85,7 +85,7 @@ Resources to update the character
 
 #### Move
 
-  curl localhost/cgi-bin/artemis/:CharacterID/location/:NewLocation
+    curl localhost/cgi-bin/artemis/:CharacterID/location/:NewLocation
 
 Moves a character to a new location. Restraints are that the previous location has been listed as valid
 within the new location. If attempting an illegal move then an error occurs.

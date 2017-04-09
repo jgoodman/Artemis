@@ -8,6 +8,7 @@ Artemis::Role::DBH
 
 use strict;
 use warnings;
+use Carp qw(confess);
 
 use Role::Tiny;
 use DBI;
@@ -33,7 +34,7 @@ sub dbh {
     my $board = shift;
     $dbh ||= do {
         my $db = $board->config->{'db'};
-        DBI->connect('dbi:mysql:'.$db->{'name'}, $db->{'user'}, $db->{'pass'}) or die "Could not connect";
+        DBI->connect('dbi:mysql:'.$db->{'name'}, $db->{'user'}, $db->{'pass'}) or confess "Could not connect";
     };
 }
 

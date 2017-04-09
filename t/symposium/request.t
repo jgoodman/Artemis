@@ -32,7 +32,7 @@ sub main : Test(5) {
     my $self = shift;
 
     my $queue_file = $self->queue_file;
-    my $request = Artemis::Symposium::Request->new({queue_file => $queue_file});
+    my $request = Artemis::Symposium::Request->new(queue_file => $queue_file);
     isa_ok($request, 'Artemis::Symposium::Request');
 
     $request->actions(
@@ -44,7 +44,7 @@ sub main : Test(5) {
     ok(-e $queue_file, 'Saved queue_file');
 
     $request = undef;
-    $request = Artemis::Symposium::Request->load({queue_file => $queue_file});
+    $request = Artemis::Symposium::Request->load(queue_file => $queue_file);
     isa_ok($request, 'Artemis::Symposium::Request');
     is($request->{'actions'}->[0], 'move', 'Correct key in queue_file found');
     is($request->{'actions'}->[1], '1,1',  'Correct value in queue_file found');

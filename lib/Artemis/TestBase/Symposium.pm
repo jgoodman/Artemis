@@ -22,7 +22,7 @@ sub entities {
     return $self->{'entities'} ||= do {
         require Artemis::Symposium::Entity;
         [
-            map { Artemis::Symposium::Entity->new($_) } (
+            map { Artemis::Symposium::Entity->new(%$_) } (
                 { id => 1, name => 'Gary',    DEX => 2 },
                 { id => 2, name => 'Bob',     DEX => 2 },
                 { id => 3, name => 'Sue',     DEX => 3 },
@@ -42,10 +42,10 @@ sub symposium {
             no warnings 'once';
             $m->mock('config', sub { $Artemis::Symposium::config ||= require 'Artemis/config.test'});
         }
-        Artemis::Symposium->new({
+        Artemis::Symposium->new(
             queue_dir => $self->queue_dir,
             entity_timeout_limit => 20,
-        })->insert;
+        )->insert;
     }
 }
 

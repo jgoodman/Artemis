@@ -8,6 +8,7 @@ Artemis::Board - A game engine for "choose your adventure" type stories
 
 use strict;
 use warnings;
+use Carp qw(confess);
 
 use JSON;
 use Artemis::Board::Location;
@@ -50,7 +51,7 @@ sub insert {
     my %args  = @_;
     my $board = $class->new;
 
-    die 'Failed to insert record' unless $board->dbh->do('INSERT INTO boards (name) VALUES (?)', { }, $args{'name'});
+    confess 'Failed to insert record' unless $board->dbh->do('INSERT INTO boards (name) VALUES (?)', { }, $args{'name'});
 
     $board->board_id($board->dbh->last_insert_id(undef, undef, 'boards', undef));
     return $board;
@@ -78,11 +79,11 @@ sub load {
     foreach my $row (@$spaces) {
         $row->{'dir'} = decode_json($row->{'dir'}) if $row->{'dir'};
         my $space = $board->add_space(%$row, _no_insert => 1);
-        die 'board failed to add_space' unless $space;
+        confess 'board failed to add_space' unless $space;
         my $pieces = $board->dbh->selectall_arrayref('SELECT * FROM pieces WHERE space_id = ?', { Slice => { }}, $space->id);
         foreach my $r (@$pieces) {
             my $piece = $board->add_piece(id => $r->{'piece_id'}, _no_insert => 1);
-            $space->receive($piece) || die 'space failed to receive';
+            $space->receive($piece) || confess 'space failed to receive';
             $pieces{ $piece->id } = $piece;
         }
     }
@@ -98,7 +99,7 @@ Returns a Piece object from given piece_id
 
 =cut
 
-sub piece { my ($b, $id) = @_; $b->{'pieces'}{$id} || die 'board failed to lookup game piece' }
+sub piece { my ($b, $id) = @_; $b->{'pieces'}{$id} || confess 'board failed to lookup game piece' }
 
 =head2 board_id
 
@@ -109,7 +110,7 @@ Returns board_id.
 sub board_id {
     my $board = shift;
     $board->{'board_id'} = shift if scalar @_;
-    return $board->{'board_id'} || die 'board_id missing';
+    return $board->{'board_id'} || confess 'board_id missing';
 }
 
 =head2 add_space
@@ -187,14 +188,14 @@ sub move_piece {
 
     my $piece;
     if(ref $piece_obj_or_id) {
-        die 'Bad ref passed in for piece' unless eval { $piece_obj_or_id->isa('Games::Board::Piece') };
+        confess 'Bad ref passed in for piece' unless eval { $piece_obj_or_id->isa('Games::Board::Piece') };
         $piece = $piece_obj_or_id;
     }
     else {
         $piece = $board->piece($piece_obj_or_id)
     }
 
-    die 'Failed to move piece' unless $piece->move($how, $which);
+    confess 'Failed to move piece' unless $piece->move($how, $which);
     $board->dbh->do('UPDATE pieces SET space_id = ? WHERE piece_id = ?', { }, $piece->current_space_id, $piece->id);
 
     return $piece;

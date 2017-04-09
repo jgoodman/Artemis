@@ -9,7 +9,7 @@ Artemis::Symposium - Queue handler for turn based events (such as combat)
 use strict;
 use warnings;
 
-use Carp qw(confess);
+use Carp qw(confess cluck);
 use Time::HiRes qw(sleep);
 use Games::Dice qw(roll);
 use AnyEvent;
@@ -24,11 +24,10 @@ with 'Artemis::Role::DBH';
 
 sub new {
     my $class = shift;
-    my $args  = shift || { };
-    my $self = bless $args, $class;
+    my %args  = @_;
+    my $self  = bless \%args, $class;
 
-    mkdir $self->pid_queue_dir;
-
+    $self->init_queue;
     return $self;
 }
 
@@ -41,8 +40,30 @@ sub insert {
     ) or confess 'Failed to insert record: symposiums';
     $self->symposium_id($self->dbh->last_insert_id(undef, undef, 'symposiums', undef));
 
-    $self->state('insert_complete');
+    $self->state('insert_complete', {pid => $$});
     return $self;    
+}
+
+sub load {
+    my $self = shift;
+
+    $self->state('load_start');
+
+    my $row = $self->dbh->selectrow_hashref(
+        "SELECT * FROM symposiums WHERE symposium_id = ?",
+        { }, $self->id
+    ) || confess('Symposium not found');
+
+    confess("Symposium is locked [pid:$$]") if $row->{'pid'};
+
+    $self->dbh->do(
+        'UPDATE symposiums SET pid = ? WHERE symposium_id = ?',
+        { }, $$, $self->id
+    ) or confess("Trouble inserting lock in database: symposiums.pid");
+
+    $self->state('load_complete');
+
+    return $self;
 }
 
 sub DESTROY {
@@ -68,6 +89,7 @@ sub symposium_id {
 }
 
 sub class { shift->{'class'} ||= 'combat' }
+sub init_queue { make_path(shift->pid_queue_dir) }
 
 sub queue_dir {
     my $self = shift;
@@ -84,7 +106,8 @@ sub state {
     my $self = shift;
     if(scalar @_) {
         my $state = $self->{'state'} = uc(shift);
-        my $meta  = shift;
+        my $meta  = shift || { };
+        $meta->{'pid'} ||= $$;
         $meta = encode_json($meta) if $meta;
         $self->debug('State: '.$state);
         $self->dbh->do(
@@ -210,7 +233,7 @@ sub wait_on_entity {
             $self->debug("Checking if queue_file exists [$queue_file]", 2);
             return unless -e $queue_file;
             $self->debug("Found queue_file [$queue_file]");
-            $request = Artemis::Symposium::Request->load({queue_file => $queue_file});
+            $request = Artemis::Symposium::Request->load(queue_file => $queue_file);
             $end_turn->send;
         },
     );

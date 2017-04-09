@@ -12,7 +12,6 @@ use Test::More;
 
 use lib "$Bin/../../lib";
 
-use Artemis::Symposium;
 use base qw(
     Artemis::TestBase::DB
     Artemis::TestBase::Symposium

@@ -2,17 +2,18 @@ package Artemis::Symposium::Entity;
 
 use strict;
 use warnings;
+use Carp qw(confess);
 
 sub new {
     my $class = shift;
-    my $args  = shift;
-    bless $args, $class;
+    my %args  = @_;
+    bless \%args, $class;
 }
 
-sub id   { shift->{'id'}       || die 'id missing' }
-sub name { shift->{'name'}     || die 'name missing' }
+sub id   { shift->{'id'}       || confess 'id missing' }
+sub name { shift->{'name'}     || confess 'name missing' }
 sub team { shift->{'team'}     ||= 2 }
 
-sub DEX  { shift->{'DEX'}  || die 'DEX missing' } # TODO
+sub DEX  { shift->{'DEX'}  || confess 'DEX missing' } # TODO
 
 1;

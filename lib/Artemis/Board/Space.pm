@@ -3,6 +3,7 @@ package Artemis::Board::Space;
 use strict;
 use warnings;
 
+use Carp qw(confess);
 use parent 'Games::Board::Space';
 
 sub new {
@@ -14,7 +15,7 @@ sub new {
         $self->{'locatation_id'} = $args{'location_id'};
         return $self;
   }
-  die 'failed to init '.$class;
+  confess 'failed to init '.$class;
 }
 sub post_id { shift->{'post_id'} }
 sub location_id { shift->{'location_id'} }

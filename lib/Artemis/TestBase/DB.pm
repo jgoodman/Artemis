@@ -2,6 +2,7 @@ package Artemis::TestBase::DB;
 
 use strict;
 use warnings;
+use Carp qw(confess);
 
 use FindBin qw($Bin);
 use Test::More;
@@ -35,7 +36,7 @@ sub database_setup : Test(setup => 1) {
         if($sql =~ m|CREATE TABLE (\w+) |) {
             Artemis::Board->dbh->do("DROP TABLE IF EXISTS $1");
         }
-        die "Failed Database Setup!\n$sql" unless Artemis::Board->dbh->do($sql);
+        confess "Failed Database Setup!\n$sql" unless Artemis::Board->dbh->do($sql);
     }
 
     pass('Database setup complete');

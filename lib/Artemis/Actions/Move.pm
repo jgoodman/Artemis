@@ -2,6 +2,7 @@ package Artemis::Actions::Move;
 
 use strict;
 use warnings;
+use Carp qw(confess);
 
 use Artemis::Board;
 
@@ -17,9 +18,9 @@ sub execute {
     $self->debug('Move action');
     
     for (qw(board_id piece_id)) {
-        die "missing $_" unless exists $args->{$_};
+        confess "missing $_" unless exists $args->{$_};
     }
-    die "needs dir or to" unless exists $args->{'dir'} || exists $args->{'to'};
+    confess "needs dir or to" unless exists $args->{'dir'} || exists $args->{'to'};
 
     my $board = Artemis::Board->load(board_id => $args->{'board_id'});
 

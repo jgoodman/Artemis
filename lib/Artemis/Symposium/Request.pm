@@ -2,6 +2,7 @@ package Artemis::Symposium::Request;
 
 use strict;
 use warnings;
+use Carp qw(confess);
 
 use File::Slurp;
 use JSON;
@@ -11,8 +12,8 @@ with 'Artemis::Role::Debug';
 
 sub new {
     my $class = shift;
-    my $args  = shift || { };
-    bless $args, $class;
+    my %args  = @_;
+    bless \%args, $class;
 }
 
 sub load {
@@ -20,7 +21,7 @@ sub load {
     my $self = $class->new(@_);
     $self->debug('Load from '.$self->queue_file);
     my $json = decode_json(read_file($self->queue_file));
-    return $class->new({ %$self, %$json });
+    return $class->new(%$self, %$json);
 }
 
 sub queue {
@@ -34,7 +35,7 @@ sub queue {
 sub queue_file {
     my $self = shift;
     $self->{'queue_file'} = shift if scalar @_;
-    return $self->{'queue_file'} || die 'queue_file missing';
+    return $self->{'queue_file'} || confess 'queue_file missing';
 }
 
 sub actions {

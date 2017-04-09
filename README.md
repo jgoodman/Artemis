@@ -1,13 +1,15 @@
 # ARTEMIS
 
-A game engine for a "choose your own adventure" type story game
+A backend REST API that serves as a game engine for "choose your own adventure" type story games.
 
-# FORWARD
+The intent is to have a CMS (WordPress) to handle the front end while the backend API
+provides enforcement of game logic. Included within this repo is a WordPress plugin which interfaces
+with the API.
 
-I've always wanted to make a game with WordPress; Not sure why but the idea has amused me for a long time.
-Welp, my dreams are coming true! I figured that WordPress will be handling the front end while I can still
-code any needed features in the backend. Most of this repo is the latter, a backend REST API that the
-included WP plugin talks to.
+Your frontend does not have to be WordPress. The selling point of this engine is to liberate you to
+using whatever system or tools that you want to use for your frontend. Code your game as a Desktop
+App in Java or use Unity instead, your restrictions are being able to make HTTP requests and
+following the Artemis paradigm.
 
 # INSTALLATION
 
@@ -21,14 +23,13 @@ The controller which handles and routes HTTP requests to Artemis perl modules. T
 
 ## lib/Artemis
 
-The model aiming to be domain-driven (I could be failing that already). These are Perl modules by the way which interfaces
-with MySQL.
+The model aims to be domain-driven. These are Perl modules by the way which interfaces with MySQL.
 
 ### Artemis::Action
 
 Represents "doing" something in the gameworld. Often composed of conditions and operations. When you _execute_ an action,
 The conditions are first evaluated; If they return true then the operations manipulate the game in some way, otherwise
-an error is thrown. Some example actions are EnterSymposium, Move, Cast, Damage.
+an error is thrown. Some example actions are "EnterSymposium", "Move", "Cast", "Damage".
 
 ### Artemis::Board
 
@@ -55,5 +56,39 @@ along with user management and authentication.
 FrontEnd WordPress Screenshot
 
 ![A screenshot of the front end](images/FrontEnd_ScreenShot.png "WordPress ScreenShot")
+
+# EXAMPLES
+
+As of April 9, 2017, much of Artemis' functionality is still in development when this section was written.
+
+In the curl examples, assume _localhost_ as the address which Artemis is running at.
+
+## Character
+
+This section pertains to character manipulation
+
+### Create
+
+  curl -X POST localhost/cgi-bin/artemis
+
+Returns the newly created CharacterId
+
+### Retrieve
+
+  curl localhost/cgi-bin/artemis/:CharacterID
+
+Returns stats and other information for given CharacterID
+
+### Update
+
+Resources to update the character
+
+#### Move
+
+  curl localhost/cgi-bin/artemis/:CharacterID/location/:NewLocation
+
+Moves a character to a new location. Restraints are that the previous location has been listed as valid
+within the new location. If attempting an illegal move then an error occurs.
+
 
 

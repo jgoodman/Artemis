@@ -12,7 +12,6 @@ use Test::More;
 
 use lib "$Bin/../../lib";
 
-use Artemis::Symposium;
 use base qw(
     Artemis::TestBase::DB
     Artemis::TestBase::Symposium
@@ -39,9 +38,9 @@ sub main : Test(9) {
     };
 
     $row = $rows->[0];
-    ok($row->{'entry_date'},                    'Row has entry_date           [log record]');
-    is($row->{'meta'},         undef,           'Row has correct meta         [log record]');
-    is($row->{'state'},        $state,          'Row has correct state        [log record]');
-    is($row->{'symposium_id'}, $symposium->id,  'Row has correct symposium_id [log record]');
+    ok($row->{'entry_date'},                        'Row has entry_date [log record]');
+    like($row->{'meta'},       qr/^{"pid":"\d+"}$/, 'Row has correct meta [log record]');
+    is($row->{'state'},        $state,              'Row has correct state [log record]');
+    is($row->{'symposium_id'}, $symposium->id,      'Row has correct symposium_id [log record]');
 }
 

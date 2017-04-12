@@ -13,34 +13,27 @@ get '/dies' => sub { die 'Intentional error' };
 
 get '/' => {text => 'Artemis API Online! '.time()};
 
-get '/json/ping' => sub {
+get '/ping' => sub {
     my $c = shift;
     $c->render(json => { pong => time, user_id => $c->param('user_id') || '' });
 };
 
-post '/json/board' => sub {
+post '/character' => sub {
     my $c = shift;
     $c->render(json => { board_id => Artemis->insert->board_id });
 };
 
-post '/json/board/:board_id/location' => sub {
+get '/character/:CharacterId' => sub {
     my $c = shift;
-
-    my $a = Artemis->load(board_id => $c->param('board_id'));
-
-    my $id = $a->add_location( fetch_params($c, 'name') )->id;
-
-    $c->render(json => { location_id => $id });
+    my $character = Artemis::Character->load($c->parame('CharacterId');
+    $c->render(json => { character => $character->info });
 };
 
-post '/json/board/:board_id/location/:location_id/space/:space_id' => sub {
+post '/character/:CharacterId/location/:LocationId' => sub {
     my $c = shift;
-
-    my $a = Artemis->load(board_id => $c->param('board_id'));
-
-    my $id = $a->add_space( fetch_params($c, 'space_id', 'dir', 'post_id', 'location_id') )->id;
-
-    $c->render(json => { space_id => $id });
+    my $character = Artemis::Entity::PlayerCharacter->load($c->param('CharacterId');
+    $character->move_to($c->param('LocationId'));
+    $c->render(json => { character => $character->info });
 };
 
 get '/html/page' => sub {

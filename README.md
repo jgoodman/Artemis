@@ -17,13 +17,17 @@ TBD
 
 # ARCHITECURE OVERVIEW
 
-## cgi-bin/artemis
+The backend takes a MVC approach hence this section being organized accordingly so.
 
-The controller which handles and routes HTTP requests to Artemis perl modules. This utilizes the Mojolicious framework. 
+## View
 
-## lib/Artemis
+### cgi-bin/artemis
 
-The model aims to be domain-driven. These are Perl modules by the way which interfaces with MySQL.
+Utilizes the Mojolicious framework, this handles and routes HTTP requests to the controller layer (Artemis modules)
+
+## Controller
+
+Perl modules by the way which interface with the Model.
 
 ### Artemis::Action
 
@@ -48,7 +52,21 @@ The background director that automates similiar to a game master. Does this by m
 
 A queue manger for turn-based events such as combat. Handles requests and executes them.
 
-## wp-content/plugins/artemis.php
+## Artemis::Model
+
+A unified interface for multiple storage drivers
+
+### Artemis::StorageDriver::MySQL
+
+TODO
+
+### Artemis::StorageDriver::File
+
+TODO
+
+## Client
+
+### wp-content/plugins/artemis.php
 
 Plugin allowing WordPress to integrate with the Artemis API. Wordpress will be handling presentation
 along with user management and authentication.
@@ -75,9 +93,9 @@ Returns the newly created CharacterId
 
 ### Retrieve
 
-    curl localhost/cgi-bin/artemis/character/:CharacterID
+    curl localhost/cgi-bin/artemis/character/:CharacterId
 
-Returns stats and other information for given CharacterID
+Returns stats and other information for given CharacterId
 
 ### Update
 
@@ -85,7 +103,7 @@ Resources to update the character
 
 #### Move
 
-    curl -X PUT localhost/cgi-bin/artemis/character/:CharacterID/location/:NewLocation
+    curl -X PUT localhost/cgi-bin/artemis/character/:CharacterId/location/:LocationId
 
 Moves a character to a new location. Restraints are that the previous location has been listed as valid
 within the new location. If attempting an illegal move then an error occurs.

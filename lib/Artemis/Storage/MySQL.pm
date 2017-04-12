@@ -52,60 +52,65 @@ sub name { shift->{'name'} }
 
 =head2 insert
 
-  my $object = $storage->insert($class, %info);
+  $storage->insert($label, %info);
 
-Create record and return it as an the object
+Create db record
 
 =cut
 
 sub insert {
     my $self  = shift;
-    my $class = shift || confess('class missing');
+    my $label = shift || confess('label missing');
     my %info  = @_;
 
-    my $object = $class->new(%info);
-
-    return $object;
+    my @cols = sort keys %info;
+    my $columns = join ', ', @cols;
+    my $holders = join ', ', map { '?' } @cols;
+    my @values  = map { $info{$_} } @cols;
+    return $self->_dbh->do("INSERT INTO $label ($columns) VALUES ($holders)", { }, @values)
+        || confess("Failed to insert row [$label]");
 }
 
 =head2 load
 
-  my $object = $storage->load($class, $id);
+  my $row = $storage->load($label, $id);
 
-Load record and return it as an object
+Load record and return it as a hashref
 
 =cut
 
 sub load {
     my $self  = shift;
-    my $class = shift || confess('class missing');
+    my $label = shift || confess('label missing');
     my $id    = shift || confess('id missing');
-
-    return $class->new(%$hash);
+    return $self->_dbh->selectrow_hashref("SELECT * FROM $label WHERE id = ?", {}, $id);
 }
 
 =head2 update
 
-  my $new = $storage->update($class, %info);
+  my $new = $storage->update($label, %info);
 
-Updates record and return the updated object
+Updates record
 
 =cut
 
 sub update {
     my $self  = shift;
-    my $class = shift || confess('class missing');
+    my $label = shift || confess('label missing');
     my %info  = @_;
 
     my $id     = $info{'id'};
-    my $object = $class->new(%info);
 
-    return $object;
+    my @cols   = sort keys %info;
+    my $bind   = join ', ', map { $_.' = ?' } @cols;
+    my @values = map { $info{$_} } @cols;
+
+    return $self->_dbh->do("UPDATE $label SET $bind", { }, @values);
 }
 
 =head2 remove
 
-  $storage->remove($class, $id);
+  $storage->remove($label, $id);
 
 Deletes the record
 
@@ -113,9 +118,10 @@ Deletes the record
 
 sub remove {
     my $self  = shift;
-    my $class = shift || confess('class missing');
+    my $label = shift || confess('label missing');
     my $id    = shift || confess('id missing');
 
+    return $self->_dbh->do("DELETE FROM $label WHERE id = ?", {}, $id) || confess("Failed to delete row [$label]");
 }
 
 1;

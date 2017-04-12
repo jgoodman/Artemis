@@ -10,16 +10,37 @@ use strict;
 use warnings;
 use Carp qw(confess cluck);
 
+our $CONFIG;
+
 =head1 METHODS
 
-=head2 new
+=head1 SYNOPSIS
 
-  my $model = Artemis::Model->new(
-      driver => 'MySQL',
-      name   => 'dbname',
-      user   => 'dbuser',
-      pass   => 'dbpass',
-  );
+  # In Artemis/config file...
+  {
+      model => {
+          driver => 'MySQL',
+          name   => 'dbname',
+          user   => 'dbuser',
+          pass   => 'dbpass',
+      }
+  }
+
+  my $model = Artemis::Model->new;;
+
+  # Create
+  $model->insert($label, %info);
+
+  # Retrieve
+  my %hash = $model->load($label, $id);
+
+  # Update
+  $model->update($label, %info);
+
+  # Delete
+  $model->remove($label, $id);
+
+=head2 new
 
 Constructs a model object
 
@@ -34,16 +55,22 @@ sub new {
 sub _storage {
     my $self = shift;
     return $self->{'storage'} ||= do {
-        my $driver = $self->{'driver'} || confess('driver missing');
+        my $opt = $self->_config->{'model'};
+
+        my $driver = $opt->{'driver'} || confess('driver missing');
         my $file = "Artemis/Storage/$driver.pm";
         require $file;
-        $file->new(
-            name => $self->{'name'} || confess('missing name'),
-            user => $self->{'user'} || '',
-            pass => $self->{'pass'} || '',
+
+        my $class = "Artemis::Storage::$driver";
+        $class->new(
+            name => $opt->{'name'} || confess('missing name'),
+            user => $opt->{'user'} || '',
+            pass => $opt->{'pass'} || '',
         );
     };
 }
+
+sub _config { $CONFIG ||= require 'Artemis/config' }
 
 sub _expand {
     my $self  = shift;
@@ -59,8 +86,6 @@ sub _expand {
 
 =head2 insert
 
-  my $object = $model->insert($label, %info);
-
 Creates underlying storage record and returns it as an the object
 
 =cut
@@ -68,12 +93,10 @@ Creates underlying storage record and returns it as an the object
 sub insert {
     my $self  = shift;
     my $label = shift || confess('label missing');
-    $self->_storage->insert($self->_expand($label), @_);
+    $self->_storage->insert($label, @_);
 }
 
 =head2 load
-
-  my $object = $model->load($label, $id);
 
 Loads underlying storage record and returns it as an object
 
@@ -83,12 +106,10 @@ sub load {
     my $self  = shift;
     my $label = shift || confess('label missing');
     my $id    = shift || confess('id missing');
-    $self->_storage->load($self->_expand($label), $id);
+    $self->_storage->load($label, $id);
 }
 
 =head2 update
-
-  my $new = $model->update($label, %info);
 
 Updates underlying storage record and returns the updated object
 
@@ -97,12 +118,10 @@ Updates underlying storage record and returns the updated object
 sub update {
     my $self  = shift;
     my $label = shift || confess('label missing');
-    $self->_storage->update($self->_expand($label), @_);
+    $self->_storage->update($label, @_);
 }
 
 =head2 remove
-
-  $model->remove($label, $id);
 
 Deletes the underlying storage record
 
@@ -112,7 +131,7 @@ sub remove {
     my $self  = shift;
     my $label = shift || confess('label missing');
     my $id    = shift || confess('id missing');
-    $self->_storage->remove($self->_expand($label), $id);
+    $self->_storage->remove($label, $id);
 }
 
 1;

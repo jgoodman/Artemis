@@ -1,0 +1,35 @@
+#!/usr/bin/perl
+eval 'use cPanelUserConfig';
+use Mojolicious::Lite;
+use FindBin qw($Bin);
+use lib "$Bin/../lib";
+use Artemis::Entity;
+
+get '/' => sub {
+    my $c = shift;
+    my $user_id = $c->param('user_id');
+    $c->stash(user_id => $user_id);
+    $c->render(template => 'main', time => time());
+};
+
+app->start;
+
+__DATA__
+
+@@ main.html.ep
+<div>
+<div>
+Artemis Shop Interface Online!
+</div>
+
+<div>
+<table>
+% for (@$items) {
+  <tr><td>row</td></tr>
+% }
+</table>
+</div>
+
+<div>
+user_id: <%= $user_id %>, generated: <%= $time %>
+</div>

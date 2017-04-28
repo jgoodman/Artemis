@@ -16,8 +16,8 @@ sub _classmap {
         'Artemis::Board::Piece'           => 'board__piece',
         'Artemis::Board::Space'           => 'board__space',
         'Artemis::Entity'                 => 'entity',
-        'Artemis::Entity::Character'      => 'entity__character',
-        'Artemis::Entity::Merchant'       => 'entity__merchant',
+        'Artemis::Entity::Character'      => 'entity',
+        'Artemis::Entity::Merchant'       => 'entity',
         'Artemis::Inventory'              => 'inventory',
         'Artemis::InventoryItem'          => 'inventory_item',
         'Artemis::Item'                   => 'item',
@@ -44,6 +44,7 @@ sub label2class {
     my $self  = shift;
     my $label = shift || confess('label missing');
     my %labelmap = reverse %{$self->_classmap};
+    $labelmap{'entity'} = 'Artemis::Entity';
     $labelmap{$label} || confess('label does not exist');
 }
 

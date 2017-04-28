@@ -71,7 +71,13 @@ sub _storage {
     };
 }
 
-sub _config { $CONFIG ||= require 'Artemis/config' }
+sub _config {
+    $CONFIG ||= do {
+        my $mode = $ENV{'ARTEMIS_MODE'};
+        my $file = 'Artemis/config'.( $mode ? '.'.lc($mode) : '' );
+        require $file
+    };
+}
 
 =head2 insert
 

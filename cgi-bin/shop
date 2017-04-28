@@ -9,7 +9,14 @@ get '/' => sub {
     my $c = shift;
     my $user_id = $c->param('user_id');
     $c->stash(user_id => $user_id);
-    $c->render(template => 'main', time => time());
+
+    my $merchants = Artemis::Entity->new->search(class => 'merchant');
+
+    $c->render(
+        template  => 'main',
+        time      => time(),
+        merchants => $merchants,
+    );
 };
 
 app->start;
@@ -17,18 +24,21 @@ app->start;
 __DATA__
 
 @@ main.html.ep
+
 <div>
 <div>
 Artemis Shop Interface Online!
 </div>
 
+% for (@$merchants) {
 <div>
 <table>
-% for (@$items) {
+% for (1 .. 3) {
   <tr><td>row</td></tr>
 % }
 </table>
 </div>
+% }
 
 <div>
 user_id: <%= $user_id %>, generated: <%= $time %>

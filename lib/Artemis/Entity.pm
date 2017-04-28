@@ -19,12 +19,18 @@ around 'new' => sub {
     my $orig = shift;
     my $class = shift;
     my $args  = shift || { };
+
     $class = ref($class) || $class;
-    if(my $subclass = $args->{'class'}) {
-        $class .= "::$subclass";
+    if($class =~ m|^Artemis::Entity::([\w:]+)$|) {
+        $args->{'class'} ||= $1;
+    }
+    elsif(my $subclass = $args->{'class'}) {
+        $subclass = ucfirst(lc($subclass));
+        $class   .= "::$subclass";
         (my $file = "$class.pm") =~ s{/}{::}g;
         require $file;
     }
+
     $orig->($class, $args, @_);
 };
 

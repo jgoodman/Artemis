@@ -2,7 +2,7 @@
 
 Test::Class->runtests;
 
-package Artemis::Symposium::Request::Test;
+package Artemis::SymposiumRequest::Test;
 
 use strict;
 use warnings;
@@ -19,7 +19,7 @@ sub queue_dir  { "$Bin/../../.queue/$$" }
 sub queue_file { shift->queue_dir().'/1' }
 
 sub load_modules : Test(startup => 1) {
-    use_ok('Artemis::Symposium::Request');
+    use_ok('Artemis::SymposiumRequest');
 }
 
 sub setup_queue : Test(setup => 1) {
@@ -32,8 +32,8 @@ sub main : Test(5) {
     my $self = shift;
 
     my $queue_file = $self->queue_file;
-    my $request = Artemis::Symposium::Request->new(queue_file => $queue_file);
-    isa_ok($request, 'Artemis::Symposium::Request');
+    my $request = Artemis::SymposiumRequest->new(queue_file => $queue_file);
+    isa_ok($request, 'Artemis::SymposiumRequest');
 
     $request->actions(
         move     => '1,1',
@@ -44,8 +44,8 @@ sub main : Test(5) {
     ok(-e $queue_file, 'Saved queue_file');
 
     $request = undef;
-    $request = Artemis::Symposium::Request->load(queue_file => $queue_file);
-    isa_ok($request, 'Artemis::Symposium::Request');
+    $request = Artemis::SymposiumRequest->load(queue_file => $queue_file);
+    isa_ok($request, 'Artemis::SymposiumRequest');
     is($request->{'actions'}->[0], 'move', 'Correct key in queue_file found');
     is($request->{'actions'}->[1], '1,1',  'Correct value in queue_file found');
 }

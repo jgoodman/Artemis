@@ -13,7 +13,12 @@ following the Artemis paradigm.
 
 # INSTALLATION
 
-TBD
+TODO: Would like to write out a Makefile to handle installation and deployment
+
+# CONFIGURATION
+
+Copy the Artemis/config-sample to Artemis/config. This file will contain settings such as what
+storage driver to use and connection information. Modify this file accordingly so.
 
 # ARCHITECURE OVERVIEW
 
@@ -27,9 +32,10 @@ Utilizes the Mojolicious framework, this handles and routes HTTP requests to the
 
 ## Controller
 
-Perl modules by the way which interface with the Model.
+Perl modules by the way which interface with the Model. Still deciding if these should be in moved to an
+Artemis::Controller:: namespace as of April 12, 2017.
 
-### Artemis::Action
+### Artemis::Actions
 
 Represents "doing" something in the gameworld. Often composed of conditions and operations. When you _execute_ an action,
 The conditions are first evaluated; If they return true then the operations manipulate the game in some way, otherwise
@@ -54,15 +60,22 @@ A queue manger for turn-based events such as combat. Handles requests and execut
 
 ## Artemis::Model
 
-A unified interface for multiple storage drivers
+A unified interface for multiple storage drivers (residing in the Artemis::Storage namespace). The controller passes
+in a data structure and the model breaks in down to smaller components. Each component is then supplied to the
+storage driver to be saved. The model also retrieves, updates, or deletes records through deletation of the
+storage driver.
 
-### Artemis::StorageDriver::MySQL
+### Artemis::Storage::MySQL
 
-TODO
+Driver to create, retrieve, update, or delete a record via MySQL database
 
-### Artemis::StorageDriver::File
+### Artemis::Storage::FileSystem
 
-TODO
+Driver to create, retrieve, update, or delete a record via filesystem
+
+### Artemis::Storage::Mock
+
+A mocked driver interface used for testing (does nothing
 
 ## Client
 
@@ -108,5 +121,8 @@ Resources to update the character
 Moves a character to a new location. Restraints are that the previous location has been listed as valid
 within the new location. If attempting an illegal move then an error occurs.
 
+# TESTS
 
+Unit tests are location in the t directory of this repo. A requirement to running some of these tests is
+having Test::Class installed.
 

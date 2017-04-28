@@ -1,4 +1,4 @@
-package Artemis::Actions::EnterSymposium;
+package Artemis::Action::EnterSymposium;
 
 use strict;
 use warnings;
@@ -42,7 +42,7 @@ __END__
 
 =head1 NAME
 
-Artemis::Actions::Move - Action to move a piece on the board
+Artemis::Action::Move - Action to move a piece on the board
 
 =cut
 

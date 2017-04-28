@@ -6,6 +6,9 @@ use warnings;
 use Carp qw(confess);
 use parent 'Games::Board::Space';
 
+use Role::Tiny::With;
+with 'Artemis::Role::Model';
+
 sub new {
   my $class = shift;
   my %args  = @_;
@@ -19,6 +22,12 @@ sub new {
 }
 sub post_id { shift->{'post_id'} }
 sub location_id { shift->{'location_id'} }
+
+sub search_by_board_id {
+    my $self     = shift;
+    my $board_id = shift;
+    [ map { $self->new(%$_) } $self->model->search('board_space', 'board_id', $board_id) ]
+}
 
 1;
 

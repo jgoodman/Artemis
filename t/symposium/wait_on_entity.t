@@ -51,7 +51,7 @@ sub request_exists : Test(3) {
     my $request = $self->symposium->wait_on_entity($self->entities->[0]);
     like(
         ref($request),
-        qr/Symposium::Request$/,
+        qr/SymposiumRequest$/,
         'Got Request object back'
     );
     note '$request='.$request unless ref($request);

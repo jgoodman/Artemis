@@ -20,9 +20,9 @@ sub pid_queue_dir { shift->queue_dir."/$$" }
 sub entities {
     my $self = shift;
     return $self->{'entities'} ||= do {
-        require Artemis::Symposium::Entity;
+        require Artemis::SymposiumEntity;
         [
-            map { Artemis::Symposium::Entity->new(%$_) } (
+            map { Artemis::SymposiumEntity->new(%$_) } (
                 { id => 1, name => 'Gary',    DEX => 2 },
                 { id => 2, name => 'Bob',     DEX => 2 },
                 { id => 3, name => 'Sue',     DEX => 3 },

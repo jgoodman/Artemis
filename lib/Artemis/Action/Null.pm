@@ -1,4 +1,4 @@
-package Artemis::Actions::Null;
+package Artemis::Action::Null;
 
 use strict;
 use warnings;
@@ -21,7 +21,7 @@ __END__
 
 =head1 NAME
 
-Artemis::Actions::Null - A "do nothing" action
+Artemis::Action::Null - A "do nothing" action
 
 =cut
 

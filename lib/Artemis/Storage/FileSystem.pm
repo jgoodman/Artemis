@@ -8,8 +8,7 @@ Artemis::Storage::FileSystem - Storage driver for file system
 
 use strict;
 use warnings;
-
-use Carp qw(confess);
+use Carp qw(confess cluck);
 
 use File::Slurp;
 use JSON;
@@ -42,7 +41,7 @@ sub name { shift->{'name'} }
 
 =head2 insert
 
-  $storage->insert($label, %info);
+  my $id = $storage->insert($label, %info);
 
 Create record
 
@@ -63,7 +62,7 @@ sub insert {
     write_file("$dir/$id", encode_json(\%info)) || confess('failed to write file');
     write_file($inc, $id);
 
-    return 1;
+    return $id;
 }
 
 =head2 load
@@ -85,6 +84,38 @@ sub load {
     $hash->{'id'} = $id;
 
     return $hash;
+}
+
+=head2 search
+
+  my @rows = $storage->search($label, $field, $id);
+
+Search for record
+
+=cut
+
+sub search {
+    my $self  = shift;
+    my $label = shift || confess('label missing');
+    my $field = shift || confess('field missing');
+    my $value = shift || confess('value missing');
+
+    my $cmp = defined $value ? sub { $_ eq $value } : sub { !defined($_) };
+
+    my @results;
+    my $dir = $self->name."/$label";
+    mkdir $dir unless -e $dir;
+    opendir(my $dh, $dir) || die "Can't open $dir: $!";
+    while (readdir $dh) {
+        my $file = $_;
+        next unless $file =~ m/^\d+$/;
+        my $row  = $self->load($label, $_);
+        next unless $cmp->($row->{$field});
+        push @results, $row;
+    }
+    closedir $dh;
+
+    return \@results;
 }
 
 =head2 update

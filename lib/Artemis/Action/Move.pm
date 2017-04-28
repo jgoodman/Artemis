@@ -1,4 +1,4 @@
-package Artemis::Actions::Move;
+package Artemis::Action::Move;
 
 use strict;
 use warnings;
@@ -16,7 +16,7 @@ sub execute {
     my $self = bless $args, $class;
 
     $self->debug('Move action');
-    
+
     for (qw(board_id piece_id)) {
         confess "missing $_" unless exists $args->{$_};
     }
@@ -36,7 +36,7 @@ __END__
 
 =head1 NAME
 
-Artemis::Actions::Move - Action to move a piece on the board
+Artemis::Action::Move - Action to move a piece on the board
 
 =cut
 

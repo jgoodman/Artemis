@@ -3,5 +3,5 @@
 config.test
 local/
 .queue
-Artemis/config
+lib/Artemis/config
 .storage

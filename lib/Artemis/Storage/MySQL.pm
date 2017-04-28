@@ -52,7 +52,7 @@ sub name { shift->{'name'} }
 
 =head2 insert
 
-  $storage->insert($label, %info);
+  my $id = $storage->insert($label, %info);
 
 Create db record
 
@@ -67,8 +67,10 @@ sub insert {
     my $columns = join ', ', @cols;
     my $holders = join ', ', map { '?' } @cols;
     my @values  = map { $info{$_} } @cols;
-    return $self->_dbh->do("INSERT INTO $label ($columns) VALUES ($holders)", { }, @values)
+    $self->_dbh->do("INSERT INTO $label ($columns) VALUES ($holders)", { }, @values)
         || confess("Failed to insert row [$label]");
+
+    return $self->_dbh->last_insert_id(undef, undef, $label, undef)
 }
 
 =head2 load

@@ -1,4 +1,4 @@
-package Artemis::Symposium::Entity;
+package Artemis::SymposiumEntity;
 
 use strict;
 use warnings;

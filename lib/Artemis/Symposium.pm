@@ -16,7 +16,7 @@ use AnyEvent;
 use JSON;
 use File::Path qw(make_path remove_tree);
 
-use Artemis::Symposium::Request;
+use Artemis::SymposiumRequest;
 
 use Role::Tiny::With;
 with 'Artemis::Role::Debug';
@@ -41,7 +41,7 @@ sub insert {
     $self->symposium_id($self->dbh->last_insert_id(undef, undef, 'symposiums', undef));
 
     $self->state('insert_complete', {pid => $$});
-    return $self;    
+    return $self;
 }
 
 sub load {
@@ -171,9 +171,9 @@ sub loop {
                 turn => $t,
                 entity => { id => $entity->id, name => $entity->name }
             });
-            
+
             my $request = $self->wait_on_entity($entity, { initiatives => $initiatives });
-            
+
             $self->state('processing_request', {
                 turn => $t,
                 entity => { id => $entity->id, name => $entity->name }
@@ -187,7 +187,7 @@ sub loop {
                 while(my $action = shift(@$actions)) {
                     my $args = shift(@$actions);
                     $self->load_action_class($action)->execute($args);
-                }   
+                }
             }
         }
     }
@@ -198,7 +198,7 @@ sub loop {
 sub load_action_class {
     my $self   = shift;
     my $action = shift;
-    my $action_class = "Artemis::Actions::".join('', map{ ucfirst($_) } split('_', $action));
+    my $action_class = "Artemis::Action::".join('', map{ ucfirst($_) } split('_', $action));
     (my $file = "$action_class.pm") =~ s{::}{/}g;
     require $file;
     return $action_class;
@@ -215,7 +215,7 @@ sub wait_on_entity {
     my $request;
     my $t = $self->{'t'} ||= 0;
     $self->debug("Wait on entity [pid:$$ - turn:$t - id:".$entity->id.']');
-    
+
     my $timeout   =  AnyEvent->timer(
         after => $self->entity_timeout_limit,
         cb    => sub {
@@ -224,7 +224,7 @@ sub wait_on_entity {
             $end_turn->send;
         },
     );
-        
+
     my $wait_on_queue = AnyEvent->timer(
         after    => 0,
         interval => 2.0,
@@ -233,7 +233,7 @@ sub wait_on_entity {
             $self->debug("Checking if queue_file exists [$queue_file]", 2);
             return unless -e $queue_file;
             $self->debug("Found queue_file [$queue_file]");
-            $request = Artemis::Symposium::Request->load(queue_file => $queue_file);
+            $request = Artemis::SymposiumRequest->load(queue_file => $queue_file);
             $end_turn->send;
         },
     );

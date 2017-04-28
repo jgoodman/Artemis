@@ -1,4 +1,4 @@
-package Artemis::Symposium::Request;
+package Artemis::SymposiumRequest;
 
 use strict;
 use warnings;

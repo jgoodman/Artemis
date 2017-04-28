@@ -29,10 +29,11 @@ our $CONFIG;
   my $model = Artemis::Model->new;;
 
   # Create
-  $model->insert($label, %info);
+  my $id = $model->insert($label, %info);
 
   # Retrieve
-  my %hash = $model->load($label, $id);
+  my $hash = $model->load($label, $id);
+  my @rows = $model->search($label, $field, $id);
 
   # Update
   $model->update($label, %info);
@@ -72,21 +73,9 @@ sub _storage {
 
 sub _config { $CONFIG ||= require 'Artemis/config' }
 
-sub _expand {
-    my $self  = shift;
-    my $label = shift || confess('label missing');
-    my %map = (
-        board             => 'Artemis::Board',
-        symposium         => 'Artemis::Symposium',
-        symposium_request => 'Artemis::SymposiumRequest',
-    );
-    my $class = $map{$label} || confess('label does not exist');
-    return($label, $class);
-}
-
 =head2 insert
 
-Creates underlying storage record and returns it as an the object
+Creates underlying storage record
 
 =cut
 
@@ -98,7 +87,7 @@ sub insert {
 
 =head2 load
 
-Loads underlying storage record and returns it as an object
+Loads underlying storage record
 
 =cut
 
@@ -109,9 +98,23 @@ sub load {
     $self->_storage->load($label, $id);
 }
 
+=head2 search
+
+Search for underlying storage record
+
+=cut
+
+sub search {
+    my $self  = shift;
+    my $label = shift || confess('label missing');
+    my $field = shift || confess('field missing');
+    my $id    = shift || confess('id missing');
+    $self->_storage->search($label, $field, $id);
+}
+
 =head2 update
 
-Updates underlying storage record and returns the updated object
+Updates underlying storage record
 
 =cut
 

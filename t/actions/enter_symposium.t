@@ -2,7 +2,7 @@
 
 Test::Class->runtests;
 
-package Artemis::Actions::EnterSymposium::Test;
+package Artemis::Action::EnterSymposium::Test;
 
 use strict;
 use warnings;
@@ -19,14 +19,14 @@ use base qw(
 
 sub load_modules : Test(startup => +1) {
     shift->SUPER::load_modules;
-    use_ok('Artemis::Actions::EnterSymposium');
+    use_ok('Artemis::Action::EnterSymposium');
 }
 
 sub insert : Test(1) {
     my $self = shift;
     local $TODO = 'Code Artemis::Symposium->insert method';
     ok(
-        eval { Artemis::Actions::EnterSymposium->execute({entities => $self->entities}) },
+        eval { Artemis::Action::EnterSymposium->execute({entities => $self->entities}) },
         'Execution returned true'
     );
 }
@@ -36,7 +36,7 @@ sub load : Test(1) {
 
     local $TODO = 'Setup existing symposium then pass in id';
     ok(
-        eval { Artemis::Actions::EnterSymposium->execute({entities => $self->entities}) },
+        eval { Artemis::Action::EnterSymposium->execute({entities => $self->entities}) },
         'Execution returned true'
     );
 }

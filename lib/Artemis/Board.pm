@@ -18,7 +18,7 @@ use Artemis::Board::Piece;
 use parent 'Games::Board';
 
 use Role::Tiny::With;
-with 'Artemis::Role::DBH';
+with 'Artemis::Role::Model';
 
 =head1 METHODS
 
@@ -40,26 +40,26 @@ sub spaceclass { 'Artemis::Board::Space' }
 
 =head2 insert
 
-  my $board_id = Artemis::Board->insert;
+  my $board = Artemis::Board->insert;
 
-Contructor method that inserts an object then inserts into database
+Contructor method that inserts an object then inserts into underlying data storage
 
 =cut
 
 sub insert {
     my $class = shift;
     my %args  = @_;
-    my $board = $class->new;
+    my $board = $class->new(%args);
 
-    confess 'Failed to insert record' unless $board->dbh->do('INSERT INTO boards (name) VALUES (?)', { }, $args{'name'});
+    my $id = $board->model->insert('board', $board);
+    $board->board_id($id);
 
-    $board->board_id($board->dbh->last_insert_id(undef, undef, 'boards', undef));
     return $board;
 }
 
 =head2 load
 
-  my $artemis = Artemis::Board->load(board_id => $id);
+  my $artemis = Artemis::Board->load($id);
 
 Contructor method that inserts an object then loads in database information
 
@@ -67,30 +67,60 @@ Contructor method that inserts an object then loads in database information
 
 sub load {
     my $class = shift;
-    my %args  = @_;
-    my $board = $class->new;
-    $board->board_id($args{'board_id'});
+    my $id    = shift;
+
+    my $self = $class->new->model->load(board => $id);
 
     my %pieces;
-    my $spaces = $board->dbh->selectall_arrayref(
-        'SELECT spaces.*, locations.name AS location_name FROM spaces JOIN locations USING (location_id) WHERE locations.board_id = ?',
-        { Slice => { } }, $board->board_id
-    );
-    foreach my $row (@$spaces) {
-        $row->{'dir'} = decode_json($row->{'dir'}) if $row->{'dir'};
-        my $space = $board->add_space(%$row, _no_insert => 1);
+    foreach my $space (@{$self->spaces}) {
+        my $space = $self->add_space(%$space, _no_insert => 1);
         confess 'board failed to add_space' unless $space;
-        my $pieces = $board->dbh->selectall_arrayref('SELECT * FROM pieces WHERE space_id = ?', { Slice => { }}, $space->id);
+        my $pieces = $self->dbh->selectall_arrayref('SELECT * FROM pieces WHERE space_id = ?', { Slice => { }}, $space->id);
         foreach my $r (@$pieces) {
-            my $piece = $board->add_piece(id => $r->{'piece_id'}, _no_insert => 1);
+            my $piece = $self->add_piece(id => $r->{'piece_id'}, _no_insert => 1);
             $space->receive($piece) || confess 'space failed to receive';
             $pieces{ $piece->id } = $piece;
         }
     }
 
-    $board->{'pieces'} = \%pieces;
+    $self->{'pieces'} = \%pieces;
 
-    return $board;
+    return $self;
+}
+
+=head2 spaces
+
+  my @locations = $board->spaces;
+
+Returns a list of Artemis::Board::Spaces objects belonging to the board
+
+=cut
+
+sub spaces {
+    my $self = shift;
+    $self->{'spaces'} ||= [ map {
+        my $location = $_;
+        map {
+            my $space = $_;
+            $space->{'dir'} = decode_json($space->{'dir'}) if $space->{'dir'};
+            Artemis::Board::Space->new($space)
+        } @{$self->model->search(board_space => location_id => $location->id)}
+    } @{$self->locations} ];
+}
+
+=head2 locations
+
+  my @locations = $board->locations;
+
+Returns a list of Artemis::Board::Location objects belonging to the board
+
+=cut
+
+sub locations {
+    my $self = shift;
+    $self->{'locations'} ||=[  map {
+        Artemis::Board::Location->new($_)
+    } @{$self->model->load(board_location => board_id => $self->id)} ];
 }
 
 =head2 piece
@@ -100,18 +130,6 @@ Returns a Piece object from given piece_id
 =cut
 
 sub piece { my ($b, $id) = @_; $b->{'pieces'}{$id} || confess 'board failed to lookup game piece' }
-
-=head2 board_id
-
-Returns board_id.
-
-=cut
-
-sub board_id {
-    my $board = shift;
-    $board->{'board_id'} = shift if scalar @_;
-    return $board->{'board_id'} || confess 'board_id missing';
-}
 
 =head2 add_space
 
@@ -126,11 +144,10 @@ sub add_space {
     my $insert = delete $args{'_no_insert'} ? 0 : 1;
     my $space = $board->SUPER::add_space(%args);
     if($insert) {
-        my $dir = $space->{'dir'};
-        $dir = encode_json($dir) if ref $dir eq 'HASH';
+        $space->{'dir'} = encode_json($space->{'dir'}) if ref $space->{'dir'} eq 'HASH';
         $board->dbh->do(
             'INSERT INTO spaces (post_id, location_id, dir) VALUES (?, ?, ?)',
-            { }, $space->post_id, $space->location_id, $dir
+            { }, $space->post_id, $space->location_id, $space->{'dir'}
         );
     }
     return $space;
